@@ -8,9 +8,7 @@ rootElement.setAttribute('id', 'review-extension');
 document.body.appendChild(rootElement);
 
 // ReactDOM.createRoot(rootElement).render(
-//     <React.StrictMode>
-//         <Main></Main>
-//     </React.StrictMode>,
+//         <h1>Hello World!</h1>
 // )
 
 export {}
