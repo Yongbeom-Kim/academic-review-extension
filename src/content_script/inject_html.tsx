@@ -1,11 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import Sidebar from '../components/Sidebar';
 
-const rootElement = document.createElement('div');
-rootElement.setAttribute('class', 'review-extension');
-rootElement.setAttribute('id', 'review-extension');
-document.body.appendChild(rootElement);
+const root = document.createElement('div');
+root.setAttribute('class', 'review-extension');
+root.setAttribute('id', 'review-extension');
+// root.style = `
+// height: 100%;
+// width: 100%;
+// `
+document.body.appendChild(root);
 
-ReactDOM.createRoot(rootElement).render(
-    <h1>Hello World!</h1>
+ReactDOM.createRoot(root).render(
+    <>
+        <Sidebar />
+    </>
 )

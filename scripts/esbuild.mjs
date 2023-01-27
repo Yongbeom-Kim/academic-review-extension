@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, { watch } from 'fs';
 import * as esbuild from 'esbuild'
 import CssModulesPlugin from 'esbuild-css-modules-plugin';
 
@@ -18,3 +18,7 @@ esbuild.build({
 
 // copy static files
 fs.cpSync('static/', 'dist/', {recursive: true, force: true})
+
+
+
+console.log('watching...')
