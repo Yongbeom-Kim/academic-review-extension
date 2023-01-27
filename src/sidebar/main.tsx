@@ -1,7 +1,7 @@
 export default function Main() {
-    return ( 
-        <main>
+    return (
+        <>
             <h1>Hello World! (Sidebar)</h1>
-        </main>
+        </>
     )
 }
