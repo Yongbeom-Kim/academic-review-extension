@@ -9,4 +9,5 @@
     margin: 0 0;
     height: 100vh;
     z-index: 2048;
+    flex-flow: column nowrap;
   }

@@ -18,7 +18,3 @@ esbuild.build({
 
 // copy static files
 fs.cpSync('static/', 'dist/', {recursive: true, force: true})
-
-
-
-console.log('watching...')
