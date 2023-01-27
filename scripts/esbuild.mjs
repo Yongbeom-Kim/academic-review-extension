@@ -1,4 +1,4 @@
-
+import fs from 'fs';
 import * as esbuild from 'esbuild'
 
 // build entries
@@ -13,3 +13,6 @@ esbuild.build({
     outdir: './dist',
     format: 'iife'
 })
+
+// copy static files
+fs.cpSync('static/', 'dist/', {recursive: true, force: true})
