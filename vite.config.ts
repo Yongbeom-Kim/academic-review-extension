@@ -7,15 +7,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        popup: '/src/popup.html',
         sidebar: '/src/sidebar.html',
-        "background/script": '/src/background/script.tsx' 
+        "content_script/inject_component": '/src/content_script/inject_component.tsx' 
       },
       output: {
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,
         assetFileNames: `assets/[name].[ext]`,
-        format: 'iife'
       }
     },
     watch: { }
