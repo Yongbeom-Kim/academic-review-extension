@@ -1,3 +1,20 @@
 {
-    "test":"test"
+    "name": "Academic Review Plugin",
+    "description": "A Cross Borwser Template for Firefox",
+    "version": "1.0.0",
+    "manifest_version": 2,
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content_script/inject_html.js"
+            ]
+        }
+    ]
 }

@@ -3,7 +3,7 @@ import * as esbuild from 'esbuild'
 
 // build entries
 const entryPoints = [
-    {in: 'src/content_script/inject_html.tsx', out: 'content_script/inject_html.js'}
+    {in: 'src/content_script/inject_html.tsx', out: 'content_script/inject_html'}
 ]
 
 esbuild.build({
