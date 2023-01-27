@@ -1,5 +1,6 @@
 import fs from 'fs';
 import * as esbuild from 'esbuild'
+import CssModulesPlugin from 'esbuild-css-modules-plugin';
 
 // build entries
 const entryPoints = [
@@ -11,7 +12,8 @@ esbuild.build({
     bundle: true,
     write: true,
     outdir: './dist',
-    format: 'iife'
+    format: 'iife',
+    plugins: [CssModulesPlugin()]
 })
 
 // copy static files
