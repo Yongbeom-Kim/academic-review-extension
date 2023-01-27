@@ -8,6 +8,8 @@
     padding: 0 0;
     margin: 0 0;
     height: 100vh;
-    z-index: 2048;
+    z-index: 999999;
     flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
   }
