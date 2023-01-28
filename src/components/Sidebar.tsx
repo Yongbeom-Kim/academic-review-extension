@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { getMaxZIndex } from '../content_script/utils/find-highest-z-index';
 import styles from './Sidebar.module.css';
-
+import browser from "webextension-polyfill";
 
 export default function Sidebar() {
     const [shown, setShown] = useState(true);
@@ -11,13 +11,13 @@ export default function Sidebar() {
     // useEffect(() => {
     //     setMaxZIndex(useMemo(() => getMaxZIndex(), []))
     // }, []);
-    
+
     useEffect(() => {
         setShown(true);
     }, []);
 
-    
-    
+
+
 
     return (
         <>
