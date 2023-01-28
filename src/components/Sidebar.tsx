@@ -83,7 +83,7 @@ function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
         <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); onSubmit(e) }} className={`${styles.form}`}>
             <fieldset>
                 <legend>Select URLs</legend>
-                <button onClick={toggleSelectedAll}>{allChecked ? "Deselect All" : "Select All"}</button>
+                <button type='button' onClick={toggleSelectedAll}>{allChecked ? "Deselect All" : "Select All"}</button>
                 <div>
                     {siteLinkData.map((value, i) => (
                         <>
