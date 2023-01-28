@@ -57,6 +57,7 @@ function UrlSelectForm() {
             }
         }
         setSiteLinks(parsedUrl);
+        setChecked(parsedUrl.map(() => false))
     }, [])
 
     function toggleSelected() {
