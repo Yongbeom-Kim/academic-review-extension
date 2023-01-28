@@ -7,6 +7,8 @@ export default function Sidebar() {
     const [shown, setShown] = useState(false);
     const toggleShown = () => setShown(shown => !shown);
 
+    const [selected, setSelected] = useState([]);
+
     // TODO: Calculate max z value and be greater than that
     // const [maxZIndex, setMaxZIndex] = useState(0);
     // useEffect(() => {
@@ -29,17 +31,43 @@ export default function Sidebar() {
             {shown ? <div className={`${styles.sidebar}`}>
                 <button onClick={e => toggleShown()} className={`${styles.hideButton}`} >
                     Hide</button>
-                <UrlButtons />
+                <UrlSelectForm formStateHook={[selected, setSelected]} />
+                <ReviewButton />
             </div> : <div>false</div>}
         </>
     )
 }
 
-function UrlButtons() {
+function UrlSelectForm({ formStateHook }) {
+
+    const [formState, setFormState] = formStateHook;
+
+    useEffect(() => {
+        console.log(formState);
+    }, [formState])
+
+    return (
+        <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); }} className={`${styles.form}`}>
+            <fieldset>
+                <legend>Select URLs</legend>
+                <div><input type='checkbox' name="checkbox" id="input1"/> <label htmlFor="input1">input1</label></div>
+                <div><input type='checkbox' name="checkbox" id="input2"/> <label htmlFor="input2">input2</label></div>
+                <div><input type='checkbox' name="checkbox" id="input3"/> <label htmlFor="input3">input3</label></div>
+                <div><input type='checkbox' name="checkbox" id="input4"/> <label htmlFor="input4">input4</label></div>
+                <div><input type='checkbox' name="checkbox" id="input5"/> <label htmlFor="input5">input5</label></div>
+            </fieldset>
+            <div>
+                <button type='button'>Add current page</button>
+                <button type='button'>Find links in page</button>
+            </div>
+        </form>
+    )
+}
+
+function ReviewButton() {
     return (
         <>
-            <button className={`${styles.urlButton1}`}>Add current page</button>
-            <button className={`${styles.urlButton2}`}>Find links in page</button>
+            <button className={`${styles.reviewButton}`}>Start Review</button>
         </>
     )
 }
