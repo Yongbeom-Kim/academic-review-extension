@@ -9,7 +9,7 @@
     ],
     "browser_action": {},
     "background": {
-        "scripts": ["background_script/detect_browser_action.js"]
+        "scripts": ["background_script/detect_browser_actions.js"]
     },
     "content_scripts": [
         {

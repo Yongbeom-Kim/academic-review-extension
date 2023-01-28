@@ -8,7 +8,7 @@ const OUT_DIR = './dist/'
 const entryPoints = [
     // extension
     {in: 'src/extension/content_script/inject_html.tsx', out: 'content_script/inject_html'},
-    {in: 'src/extension/background_script/detect_browser_action.ts', out: 'background_script/detect_browser_action'},
+    {in: 'src/extension/background_script/detect_browser_actions.ts', out: 'background_script/detect_browser_actions'},
 
     // extension page
     {in: 'src/extension_page/index.tsx', out: 'extension_page/index'}

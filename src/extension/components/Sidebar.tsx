@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
-import browser from 'webextension-polyfill';
+import browser, { tabs } from 'webextension-polyfill';
 import ParserDriver, { ParsedUrl } from '../website_driver/BaseParserDriver';
 import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
@@ -17,8 +17,13 @@ export default function Sidebar() {
 
     const onFormSubmit = (e) => {
         const submitData = siteLinkData.filter((x, i) => checked[i]);
-        console.log({'form_submit_data': submitData})
-        browser.windows.create({
+        console.log({ 'form_submit_data': submitData })
+
+        // send message to create new window
+        // received at src/extension/background_script/detect_browser_actions.ts
+        browser.runtime.sendMessage({
+            message: "start_review",
+            data: submitData
         })
     }
 
