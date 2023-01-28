@@ -17,4 +17,10 @@
     display: flex;
 }
 
+.urlButtons {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    justify-content: stretch;
+}
         
