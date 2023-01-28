@@ -74,16 +74,16 @@ function UrlSelectForm({ formStateHook, visible }) {
                 <div><input type='checkbox' name="checkbox" id="input4" /> <label htmlFor="input4">input4</label></div>
                 <div><input type='checkbox' name="checkbox" id="input5" /> <label htmlFor="input5">input5</label></div> */}
 
-                {siteLinks.map(value => {
+                {siteLinks.map(value => (
                     <div>
                         <input type="checkbox" name="checkbox" id={value.text} value={value.href} />
                         <label htmlFor={value.text}>{value.text}</label>
                     </div>
-                })}
+                ))}
             </fieldset>
             <div>
                 <button type='button'>Add current page</button>
-                <button type='button'>Find links in page</button>
+                <button type='button'>Add links in page</button>
             </div>
         </form>
     )
