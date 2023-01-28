@@ -8,6 +8,9 @@
         "scripting"
     ],
     "browser_action": {},
+    "background": {
+        "scripts": ["background_script/detect_browser_action.js"]
+    },
     "content_scripts": [
         {
             "matches": [

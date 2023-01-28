@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { getMaxZIndex } from '../content_script/utils/find-highest-z-index';
+import browser from 'webextension-polyfill';
+// import { getMaxZIndex } from '../content_script/utils/find-highest-z-index';
 import styles from './Sidebar.module.css';
-import browser from "webextension-polyfill";
+
 
 export default function Sidebar() {
     const [shown, setShown] = useState(true);
-
+    const toggleShown = () => setShown(shown => !shown);
+    
     // TODO: Calculate max z value and be greater than that
     // const [maxZIndex, setMaxZIndex] = useState(0);
     // useEffect(() => {
@@ -14,6 +16,13 @@ export default function Sidebar() {
 
     useEffect(() => {
         setShown(true);
+        browser.runtime.onMessage.addListener(message => {
+            console.log("msg received");
+            console.log({message});
+            if (message.message = 'browser_action') {
+                toggleShown()
+            }
+        })
     }, []);
 
 
@@ -24,9 +33,9 @@ export default function Sidebar() {
             {shown ? <div className={`${styles.sidebar}`}>
                 <button onClick={
                     e => {
-                        setShown(false);
+                        toggleShown()
                         setTimeout(() => {
-                            setShown(true);
+                            toggleShown();
                         }, 1000);
                     }} >
                     Hide</button>
