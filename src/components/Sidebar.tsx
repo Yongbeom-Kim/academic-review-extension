@@ -5,9 +5,9 @@ import styles from './Sidebar.module.css';
 
 
 export default function Sidebar() {
-    const [shown, setShown] = useState(true);
+    const [shown, setShown] = useState(false);
     const toggleShown = () => setShown(shown => !shown);
-    
+
     // TODO: Calculate max z value and be greater than that
     // const [maxZIndex, setMaxZIndex] = useState(0);
     // useEffect(() => {
@@ -15,10 +15,7 @@ export default function Sidebar() {
     // }, []);
 
     useEffect(() => {
-        setShown(true);
         browser.runtime.onMessage.addListener(message => {
-            console.log("msg received");
-            console.log({message});
             if (message.message = 'browser_action') {
                 toggleShown()
             }
@@ -31,13 +28,7 @@ export default function Sidebar() {
     return (
         <>
             {shown ? <div className={`${styles.sidebar}`}>
-                <button onClick={
-                    e => {
-                        toggleShown()
-                        setTimeout(() => {
-                            toggleShown();
-                        }, 1000);
-                    }} >
+                <button onClick={e => toggleShown()} >
                     Hide</button>
                 <h1>Header1</h1>
                 <h2>Header2</h2>
