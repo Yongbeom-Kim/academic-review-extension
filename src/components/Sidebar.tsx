@@ -75,13 +75,19 @@ function UrlSelectForm() {
                         <>
                             <input
                                 checked={checked[i]}
-                                onChange={e => {setChecked(checked => checked.map((x, j) => i == j ? e.target.checked : x)) }}
+                                onChange={e => { setChecked(checked => checked.map((x, j) => i == j ? e.target.checked : x)) }}
                                 type="checkbox"
                                 name="checkbox"
                                 id={value.display_string}
                                 value={value.link}
+                                key={`${i}1`}
                             />
-                            <label htmlFor={value.display_string}>{value.display_string}</label>
+                            <label
+                                htmlFor={value.display_string}
+                                key={`${i}2`}
+                            >
+                                {value.display_string}
+                            </label>
                         </>
                     ))}
                 </div>
