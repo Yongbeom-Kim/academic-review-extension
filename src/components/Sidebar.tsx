@@ -31,7 +31,7 @@ export default function Sidebar() {
             {shown ? <div className={`${styles.sidebar}`}>
                 <button onClick={e => toggleShown()} className={`${styles.hideButton}`} >
                     Hide</button>
-                <UrlSelectForm formStateHook={[selected, setSelected]} visible={shown}/>
+                <UrlSelectForm formStateHook={[selected, setSelected]} visible={shown} />
                 <ReviewButton />
             </div> : <div>false</div>}
         </>
@@ -50,16 +50,17 @@ function UrlSelectForm({ formStateHook, visible }) {
             })
             .filter(x => x.text?.length ?? 0 > 0)
             .filter(x => (x.href?.startsWith("https://") || x.href?.startsWith("http://") || x.href?.startsWith("www.")))
+            
 
         setSiteLinks(urls);
     }, [])
 
     useEffect(() => {
-        console.log({formState});
+        console.log({ formState });
     }, [formState])
 
     useEffect(() => {
-        console.log({siteLinks});
+        console.log({ siteLinks });
     }, [siteLinks])
 
 
@@ -68,18 +69,14 @@ function UrlSelectForm({ formStateHook, visible }) {
         <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); }} className={`${styles.form}`}>
             <fieldset>
                 <legend>Select URLs</legend>
-                {/* <div><input type='checkbox' name="checkbox" id="input1" /> <label htmlFor="input1">input1</label></div>
-                <div><input type='checkbox' name="checkbox" id="input2" /> <label htmlFor="input2">input2</label></div>
-                <div><input type='checkbox' name="checkbox" id="input3" /> <label htmlFor="input3">input3</label></div>
-                <div><input type='checkbox' name="checkbox" id="input4" /> <label htmlFor="input4">input4</label></div>
-                <div><input type='checkbox' name="checkbox" id="input5" /> <label htmlFor="input5">input5</label></div> */}
-
-                {siteLinks.map(value => (
-                    <div>
-                        <input type="checkbox" name="checkbox" id={value.text} value={value.href} />
-                        <label htmlFor={value.text}>{value.text}</label>
-                    </div>
-                ))}
+                <div>
+                    {siteLinks.map(value => (
+                        <>
+                            <input type="checkbox" name="checkbox" id={value.text} value={value.href} />
+                            <label htmlFor={value.text}>{value.text}</label>
+                        </>
+                    ))}
+                </div>
             </fieldset>
             <div>
                 <button type='button'>Add current page</button>
