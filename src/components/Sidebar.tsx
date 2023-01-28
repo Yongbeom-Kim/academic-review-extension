@@ -12,12 +12,6 @@ export default function Sidebar() {
 
     const [selected, setSelected] = useState([]);
 
-    // TODO: Calculate max z value and be greater than that
-    // const [maxZIndex, setMaxZIndex] = useState(0);
-    // useEffect(() => {
-    //     setMaxZIndex(useMemo(() => getMaxZIndex(), []))
-    // }, []);
-
     useEffect(() => {
         browser.runtime.onMessage.addListener(message => {
             if (message.message = 'browser_action') {
@@ -41,9 +35,7 @@ export default function Sidebar() {
     )
 }
 
-function UrlSelectForm({ formStateHook, visible }) {
-
-    const [formState, setFormState] = formStateHook;
+function UrlSelectForm() {
 
     // @ts-ignore
     const [siteLinks, setSiteLinks]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
@@ -54,8 +46,6 @@ function UrlSelectForm({ formStateHook, visible }) {
         let parsedUrl: ParsedUrl[] = []
         for (let i = 0; i < parserList.length; i++) {
             const parser = parserList[i];
-            console.log({url: document.URL})
-            console.log(parser.is_url(document.URL))
             if (parser.is_url(document.URL)) {
                 parsedUrl = parserList[i].get_links(document);
                 break;
@@ -63,14 +53,6 @@ function UrlSelectForm({ formStateHook, visible }) {
         }
         setSiteLinks(parsedUrl);
     }, [])
-
-    useEffect(() => {
-        console.log({ formState });
-    }, [formState])
-
-    useEffect(() => {
-        console.log({ siteLinks });
-    }, [siteLinks])
 
 
 
