@@ -10,13 +10,19 @@ export default function Sidebar() {
     const [shown, setShown] = useState(false);
     const toggleShown = () => setShown(shown => !shown);
 
-    const [selected, setSelected] = useState([]);
-
-    // Form Data
+    // Handling
     // @ts-ignore
     const [siteLinkData, setSiteLinkData]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
     // @ts-ignore
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
+
+    const onFormSubmit = (e) => {
+        console.log({checked})
+        console.log({siteLinkData})
+        const submitData = siteLinkData.filter((x, i) => checked[i]);
+        console.log(submitData)
+    }
+
 
     useEffect(() => {
         browser.runtime.onMessage.addListener(message => {
@@ -28,15 +34,16 @@ export default function Sidebar() {
 
 
 
-    
-        
     return (
         <>
             {shown ? <div className={`${styles.sidebar}`}>
                 <button onClick={e => toggleShown()} className={`${styles.hideButton}`} >
                     Hide</button>
-                <UrlSelectForm siteLinkDataHook={[siteLinkData, setSiteLinkData]} checkedStateHook={[checked, setChecked]}/>
-                <ReviewButton />
+                <UrlSelectForm
+                    siteLinkDataHook={[siteLinkData, setSiteLinkData]}
+                    checkedStateHook={[checked, setChecked]}
+                    onSubmit={onFormSubmit}
+                />
             </div> : <div>false</div>}
         </>
     )
@@ -44,12 +51,13 @@ export default function Sidebar() {
 
 
 
-function UrlSelectForm({siteLinkDataHook, checkedStateHook}) {
-    
+function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
+
     const [siteLinkData, setSiteLinkData]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = siteLinkDataHook
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = checkedStateHook
-    
+
     const [allChecked, setAllChecked] = useState(false)
+
 
     useEffect(() => setAllChecked(checked.reduce((a, b) => a && b, true)), [checked])
 
@@ -74,7 +82,7 @@ function UrlSelectForm({siteLinkDataHook, checkedStateHook}) {
     }
 
     return (
-        <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); }} className={`${styles.form}`}>
+        <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); onSubmit(e) }} className={`${styles.form}`}>
             <fieldset>
                 <legend>Select URLs</legend>
                 <button onClick={toggleSelectedAll}>{allChecked ? "Deselect All" : "Select All"}</button>
@@ -104,14 +112,7 @@ function UrlSelectForm({siteLinkDataHook, checkedStateHook}) {
                 <button type='button'>Add current page</button>
                 <button type='button'>Add links in page</button>
             </div>
+            <button type="submit">Start Review</button>
         </form>
-    )
-}
-
-function ReviewButton() {
-    return (
-        <>
-            <button className={`${styles.reviewButton}`}>Start Review</button>
-        </>
     )
 }
