@@ -1,5 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import browser from 'webextension-polyfill';
+import ParserDriver, { ParsedUrl } from '../website_driver/BaseParserDriver';
+import DefaultParserDriver from '../website_driver/DefaultParserDriver';
+import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
 // import { getMaxZIndex } from '../content_script/utils/find-highest-z-index';
 import styles from './Sidebar.module.css';
 
@@ -42,17 +45,23 @@ function UrlSelectForm({ formStateHook, visible }) {
 
     const [formState, setFormState] = formStateHook;
 
-    const [siteLinks, setSiteLinks] = useState([{ href: "", text: "" }]);
-    useEffect(() => {
-        const urls = Array.from(document.querySelectorAll('a[href]'))
-            .map(x => {
-                return { href: x.getAttribute('href'), text: x.textContent }
-            })
-            .filter(x => x.text?.length ?? 0 > 0)
-            .filter(x => (x.href?.startsWith("https://") || x.href?.startsWith("http://") || x.href?.startsWith("www.")))
-            
+    // @ts-ignore
+    const [siteLinks, setSiteLinks]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
 
-        setSiteLinks(urls);
+    useEffect(() => {
+        const parserList: ParserDriver[] = [new RafflesBulletinOfZoologyDriver(), new DefaultParserDriver()]
+
+        let parsedUrl: ParsedUrl[] = []
+        for (let i = 0; i < parserList.length; i++) {
+            const parser = parserList[i];
+            console.log({url: document.URL})
+            console.log(parser.is_url(document.URL))
+            if (parser.is_url(document.URL)) {
+                parsedUrl = parserList[i].get_links(document);
+                break;
+            }
+        }
+        setSiteLinks(parsedUrl);
     }, [])
 
     useEffect(() => {
@@ -72,8 +81,8 @@ function UrlSelectForm({ formStateHook, visible }) {
                 <div>
                     {siteLinks.map(value => (
                         <>
-                            <input type="checkbox" name="checkbox" id={value.text} value={value.href} />
-                            <label htmlFor={value.text}>{value.text}</label>
+                            <input type="checkbox" name="checkbox" id={value.display_string} value={value.link} />
+                            <label htmlFor={value.display_string}>{value.display_string}</label>
                         </>
                     ))}
                 </div>
