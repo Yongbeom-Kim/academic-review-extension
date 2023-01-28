@@ -47,7 +47,8 @@
     height: 80vh;
     overflow: auto;
     display: grid;
-    grid-template-columns: 0fr 1fr;
+    grid-template-columns: minmax(13px, 0fr) 1fr;
+    column-gap: 8px;
 }
 
 .form>fieldset * {
