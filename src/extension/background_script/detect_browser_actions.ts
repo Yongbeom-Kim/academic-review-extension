@@ -13,7 +13,7 @@ browser.runtime.onMessage.addListener((request) => {
     // src/extension/components/Sidebar.tsx
     if (request.message = 'start_review') {
         browser.windows.create({
-            url: 'www.google.com',
+            url: 'extension_page/index.html',
             type: 'popup'
         })
     }
