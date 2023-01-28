@@ -1,5 +1,7 @@
 .sidebar {
-    background-color: green;
+    background-color: white;
+    border-width: 0px;
+    border-left: 5px black solid;
     width: 30vw;
     position: fixed;
     top: 0;
@@ -12,6 +14,7 @@
     flex-flow: column nowrap;
     align-items: stretch;
     justify-content: flex-start;
+    display: flex;
 }
 
         
