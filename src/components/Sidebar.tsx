@@ -60,7 +60,7 @@ function UrlSelectForm() {
         setChecked(parsedUrl.map(() => false))
     }, [])
 
-    function toggleSelected() {
+    function toggleSelectedAll() {
         const is_everything_checked = allChecked // to prevent needless updates from useEffect
         setChecked(checked => checked.map(() => !is_everything_checked))
     }
@@ -69,13 +69,13 @@ function UrlSelectForm() {
         <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); }} className={`${styles.form}`}>
             <fieldset>
                 <legend>Select URLs</legend>
-                <button onClick={toggleSelected}>Select All</button>
+                <button onClick={toggleSelectedAll}>Select All</button>
                 <div>
                     {siteLinks.map((value, i) => (
                         <>
                             <input
                                 checked={checked[i]}
-                                onChange={e => {checked[i]=e.target.checked}}
+                                onChange={e => {setChecked(checked => checked.map((x, j) => i == j ? e.target.checked : x)) }}
                                 type="checkbox"
                                 name="checkbox"
                                 id={value.display_string}
