@@ -41,6 +41,9 @@ function UrlSelectForm() {
     const [siteLinks, setSiteLinks]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
     // @ts-ignore
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
+    const [allChecked, setAllChecked] = useState(false)
+
+    useEffect(() => setAllChecked(checked.reduce((a, b) => a && b, true)), [checked])
 
     useEffect(() => {
         const parserList: ParserDriver[] = [new RafflesBulletinOfZoologyDriver(), new DefaultParserDriver()]
@@ -56,12 +59,16 @@ function UrlSelectForm() {
         setSiteLinks(parsedUrl);
     }, [])
 
-
+    function toggleSelected() {
+        const is_everything_checked = allChecked // to prevent needless updates from useEffect
+        setChecked(checked => checked.map(() => !is_everything_checked))
+    }
 
     return (
         <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); }} className={`${styles.form}`}>
             <fieldset>
                 <legend>Select URLs</legend>
+                <button onClick={toggleSelected}>Select All</button>
                 <div>
                     {siteLinks.map((value, i) => (
                         <>
