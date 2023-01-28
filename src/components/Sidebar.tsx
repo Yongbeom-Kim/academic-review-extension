@@ -17,10 +17,8 @@ export default function Sidebar() {
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
 
     const onFormSubmit = (e) => {
-        console.log({checked})
-        console.log({siteLinkData})
         const submitData = siteLinkData.filter((x, i) => checked[i]);
-        console.log(submitData)
+        console.log({'form_submit_data': submitData})
     }
 
 
