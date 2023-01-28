@@ -50,12 +50,18 @@
     grid-template-columns: 0fr 1fr;
 }
 
+.form>fieldset * {
+    width: 100%;
+}
+
 .form>fieldset>div>input {
     grid-column: 1;
+    margin: 0px auto;
+    border-top: 1px black solid;
 }
 
 .form>fieldset>div>label {
     grid-column: 2;
-    margin-top: auto;
-    margin-bottom: auto;
+    margin: 0px auto;
+    border-top: 1px black solid;
 }
