@@ -69,7 +69,7 @@ function UrlSelectForm() {
         <form id="url_select_form" action="" onSubmit={e => { e.preventDefault(); }} className={`${styles.form}`}>
             <fieldset>
                 <legend>Select URLs</legend>
-                <button onClick={toggleSelectedAll}>Select All</button>
+                <button onClick={toggleSelectedAll}>{allChecked ? "Deselect All" : "Select All"}</button>
                 <div>
                     {siteLinks.map((value, i) => (
                         <>
