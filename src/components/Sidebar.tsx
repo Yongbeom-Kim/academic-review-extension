@@ -12,6 +12,12 @@ export default function Sidebar() {
 
     const [selected, setSelected] = useState([]);
 
+    // Form Data
+    // @ts-ignore
+    const [siteLinkData, setSiteLinkData]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
+    // @ts-ignore
+    const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
+
     useEffect(() => {
         browser.runtime.onMessage.addListener(message => {
             if (message.message = 'browser_action') {
@@ -22,25 +28,27 @@ export default function Sidebar() {
 
 
 
-
+    
+        
     return (
         <>
             {shown ? <div className={`${styles.sidebar}`}>
                 <button onClick={e => toggleShown()} className={`${styles.hideButton}`} >
                     Hide</button>
-                <UrlSelectForm formStateHook={[selected, setSelected]} visible={shown} />
+                <UrlSelectForm siteLinkDataHook={[siteLinkData, setSiteLinkData]} checkedStateHook={[checked, setChecked]}/>
                 <ReviewButton />
             </div> : <div>false</div>}
         </>
     )
 }
 
-function UrlSelectForm() {
 
-    // @ts-ignore
-    const [siteLinks, setSiteLinks]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
-    // @ts-ignore
-    const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
+
+function UrlSelectForm({siteLinkDataHook, checkedStateHook}) {
+    
+    const [siteLinkData, setSiteLinkData]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = siteLinkDataHook
+    const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = checkedStateHook
+    
     const [allChecked, setAllChecked] = useState(false)
 
     useEffect(() => setAllChecked(checked.reduce((a, b) => a && b, true)), [checked])
@@ -56,7 +64,7 @@ function UrlSelectForm() {
                 break;
             }
         }
-        setSiteLinks(parsedUrl);
+        setSiteLinkData(parsedUrl);
         setChecked(parsedUrl.map(() => false))
     }, [])
 
@@ -71,7 +79,7 @@ function UrlSelectForm() {
                 <legend>Select URLs</legend>
                 <button onClick={toggleSelectedAll}>{allChecked ? "Deselect All" : "Select All"}</button>
                 <div>
-                    {siteLinks.map((value, i) => (
+                    {siteLinkData.map((value, i) => (
                         <>
                             <input
                                 checked={checked[i]}
