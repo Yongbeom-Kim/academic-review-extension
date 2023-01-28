@@ -3,14 +3,13 @@ import browser from 'webextension-polyfill';
 import ParserDriver, { ParsedUrl } from '../website_driver/BaseParserDriver';
 import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
-// import { getMaxZIndex } from '../content_script/utils/find-highest-z-index';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar() {
     const [shown, setShown] = useState(false);
     const toggleShown = () => setShown(shown => !shown);
 
-    // Handling
+    // Handling Form Input
     // @ts-ignore
     const [siteLinkData, setSiteLinkData]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
     // @ts-ignore
