@@ -107,10 +107,6 @@ function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
                     ))}
                 </div>
             </fieldset>
-            <div>
-                <button type='button'>Add current page</button>
-                <button type='button'>Add links in page</button>
-            </div>
             <button type="submit">Start Review</button>
         </form>
     )
