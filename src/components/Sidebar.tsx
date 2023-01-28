@@ -39,6 +39,8 @@ function UrlSelectForm() {
 
     // @ts-ignore
     const [siteLinks, setSiteLinks]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
+    // @ts-ignore
+    const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
 
     useEffect(() => {
         const parserList: ParserDriver[] = [new RafflesBulletinOfZoologyDriver(), new DefaultParserDriver()]
@@ -61,9 +63,16 @@ function UrlSelectForm() {
             <fieldset>
                 <legend>Select URLs</legend>
                 <div>
-                    {siteLinks.map(value => (
+                    {siteLinks.map((value, i) => (
                         <>
-                            <input type="checkbox" name="checkbox" id={value.display_string} value={value.link} />
+                            <input
+                                checked={checked[i]}
+                                onChange={e => {checked[i]=e.target.checked}}
+                                type="checkbox"
+                                name="checkbox"
+                                id={value.display_string}
+                                value={value.link}
+                            />
                             <label htmlFor={value.display_string}>{value.display_string}</label>
                         </>
                     ))}
