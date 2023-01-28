@@ -27,7 +27,7 @@ export default function Sidebar() {
     return (
         <>
             {shown ? <div className={`${styles.sidebar}`}>
-                <button onClick={e => toggleShown()} >
+                <button onClick={e => toggleShown()} className={`${styles.hideButton}`} >
                     Hide</button>
                 <UrlButtons />
             </div> : <div>false</div>}
@@ -37,9 +37,9 @@ export default function Sidebar() {
 
 function UrlButtons() {
     return (
-        <div className={`${styles.urlButtons}`}>
-            <button>Add current page</button>
-            <button>Find links in page</button>
-        </div>
+        <>
+            <button className={`${styles.urlButton1}`}>Add current page</button>
+            <button className={`${styles.urlButton2}`}>Find links in page</button>
+        </>
     )
 }
