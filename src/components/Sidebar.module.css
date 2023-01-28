@@ -49,9 +49,16 @@
     display: grid;
     grid-template-columns: 0fr 1fr;
 }
+
+.form>fieldset>div>* {
+    border:solid black;
+    border-width: 2px 0px;
+}
+
 .form>fieldset>div>input {
     grid-column: 1;
 }
+
 .form>fieldset>div>label {
     grid-column: 2;
     margin-top: auto;
