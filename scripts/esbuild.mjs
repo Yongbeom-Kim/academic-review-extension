@@ -4,8 +4,8 @@ import CssModulesPlugin from 'esbuild-css-modules-plugin';
 
 // build entries
 const entryPoints = [
-    {in: 'src/content_script/inject_html.tsx', out: 'content_script/inject_html'},
-    {in: 'src/background_script/detect_browser_action.ts', out: 'background_script/detect_browser_action'},
+    {in: 'src/extension/content_script/inject_html.tsx', out: 'content_script/inject_html'},
+    {in: 'src/extension/background_script/detect_browser_action.ts', out: 'background_script/detect_browser_action'},
 ]
 
 esbuild.build({

@@ -19,6 +19,8 @@ export default function Sidebar() {
     const onFormSubmit = (e) => {
         const submitData = siteLinkData.filter((x, i) => checked[i]);
         console.log({'form_submit_data': submitData})
+        browser.windows.create({
+        })
     }
 
 
