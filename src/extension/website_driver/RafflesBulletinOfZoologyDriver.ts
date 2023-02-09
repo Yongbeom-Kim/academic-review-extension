@@ -11,12 +11,16 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
         return Array.from(document.querySelectorAll('div.publication-layout'))
             .map(node => {
                 const children = node.children
-                const exerpt = children[2].textContent?.trim()
 
                 const authors = toTitleCase(children[0].textContent?.trim() ?? "")
                 const title = toTitleCase(children[1].textContent?.trim() ?? "")
-                const publication_type = exerpt?.slice(0, exerpt.search(RafflesBulletinOfZoologyDriver.EXCERPT_REGEX))?.trim() ?? ""
-                const pages = exerpt?.slice(exerpt.search(RafflesBulletinOfZoologyDriver.EXCERPT_REGEX))?.trim() ?? ""
+
+
+                const excerpt = children[2].textContent?.trim() ?? "";
+                const excerpt_delimiter_index = excerpt.indexOf('. ');
+                const publication_type = excerpt?.slice(0, excerpt_delimiter_index)?.trim() ?? ""
+                const pages = excerpt?.slice(excerpt_delimiter_index + 2)?.trim() ?? ""
+                
                 const link = children[3].getAttribute('href') ?? ""
 
                 const display_string = title.length != 0 ? title : authors
