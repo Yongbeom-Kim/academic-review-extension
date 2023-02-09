@@ -10,22 +10,29 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     get_links(document: Document): ParsedUrl[] {
         return Array.from(document.querySelectorAll('div.publication-layout'))
             .map(node => {
-                const children = node.children
+                try {
 
-                const authors = toTitleCase(children[0].textContent?.trim() ?? "")
-                const title = toTitleCase(children[1].textContent?.trim() ?? "")
+                    const children = node.children
 
+                    const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
 
-                const excerpt = children[2].textContent?.trim() ?? "";
-                const excerpt_delimiter_index = excerpt.indexOf('. ');
-                const publication_type = excerpt?.slice(0, excerpt_delimiter_index)?.trim() ?? ""
-                const pages = excerpt?.slice(excerpt_delimiter_index + 2)?.trim() ?? ""
-                
-                const link = children[3].getAttribute('href') ?? ""
+                    const authors = toTitleCase(children[0].textContent?.trim() ?? "")
+                    const title = toTitleCase(children[1].textContent?.trim() ?? "")
 
-                const display_string = title.length != 0 ? title : authors
+                    const excerpt = children[2].textContent?.trim() ?? "";
+                    const excerpt_delimiter_index = excerpt.indexOf('. ');
+                    const publication_type = excerpt?.slice(0, excerpt_delimiter_index)?.trim() ?? ""
+                    const pages = excerpt?.slice(excerpt_delimiter_index + 2)?.trim() ?? ""
 
-                return {authors, title, publication_type, pages, link, display_string}
+                    const link = children[3].getAttribute('href') ?? ""
+
+                    const display_string = title.length != 0 ? title : authors
+
+                    return { volume_no, authors, title, publication_type, pages, link, display_string }
+                } catch (e) {
+                    console.error(e);
+                    return;
+                }
             })
             .map(ParsedUrl.parsePlainObject)
     }
