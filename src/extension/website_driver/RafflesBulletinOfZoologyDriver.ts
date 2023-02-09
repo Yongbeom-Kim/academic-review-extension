@@ -17,7 +17,16 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
                     const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
 
                     const authors = toTitleCase(children[0].textContent?.trim() ?? "")
+                    let author_count;
+                    if (authors.includes(',')) {
+                        author_count = authors.split(',').length + 1;
+                    } else {
+                        author_count = authors.includes('&') || authors.includes('And') ? 2 : 1;
+                    }
                     const title = toTitleCase(children[1].textContent?.trim() ?? "")
+
+
+
 
                     const excerpt = children[2].textContent?.trim() ?? "";
                     const excerpt_delimiter_index = excerpt.indexOf('. ');
@@ -28,7 +37,16 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
                     const display_string = title.length != 0 ? title : authors
 
-                    return { volume_no, authors, title, publication_type, pages, link, display_string }
+                    return {
+                        volume_no,
+                        authors,
+                        author_count: author_count.toString(),
+                        title,
+                        publication_type,
+                        pages,
+                        link,
+                        display_string
+                    }
                 } catch (e) {
                     console.error(e);
                     return;
