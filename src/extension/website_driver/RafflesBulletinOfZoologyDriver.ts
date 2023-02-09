@@ -1,6 +1,6 @@
 import { ParsedUrl } from "../model/ParsedUrlObject";
 import ParserDriver from "./BaseParserDriver";
-import { toTitleCase } from "./utils/str_utils";
+import { toTitleCase } from "../libs/utils/str_utils";
 
 export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     // Example: https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-63/

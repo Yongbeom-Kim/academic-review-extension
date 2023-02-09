@@ -6,6 +6,7 @@ import ParserDriver from '../website_driver/BaseParserDriver';
 import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
 import styles from './Sidebar.module.css';
+import { objArrayToCsv } from '../libs/utils/obj_utils';
 
 export default function Sidebar() {
     const [shown, setShown] = useState(false);
@@ -21,16 +22,17 @@ export default function Sidebar() {
         const submitData = siteLinkData.filter((x, i) => checked[i]);
         console.log({ 'form_submit_data': submitData })
 
-        // send message to create new window
-        // received at src/extension/background_script/detect_browser_actions.ts
-        // browser.runtime.sendMessage({
-        //     message: "start_review",
-        //     data: submitData
-        // })
-        localStorage.setItem("data", JSON.stringify(instanceToPlain(siteLinkData)));
+        // @ts-ignore some type problems here, this is the correct type
+        let submitDataPlainObj: Record<string, any>[] = instanceToPlain(submitData);
 
-        console.log("localstorage:");
-        console.log(localStorage.getItem("data"));
+        localStorage.removeItem('data');
+        localStorage.setItem("data", JSON.stringify(submitDataPlainObj));
+
+        let csvContent = "data:text/csv;charset=utf-8," 
+            + objArrayToCsv(submitData.map(x => x.toExportableObject()))
+
+        window.open(encodeURI(csvContent));
+
     }
 
 
