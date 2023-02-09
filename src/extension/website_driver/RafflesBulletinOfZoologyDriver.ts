@@ -10,6 +10,7 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     get_links(document: Document): ParsedUrl[] {
         return Array.from(document.querySelectorAll('div.publication-layout'))
             .map(node => {
+                // TODO: get rid of this
                 try {
 
                     const children = node.children
@@ -18,15 +19,14 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
                     const authors = toTitleCase(children[0].textContent?.trim() ?? "")
                     let author_count;
+
                     if (authors.includes(',')) {
                         author_count = authors.split(',').length + 1;
                     } else {
                         author_count = authors.includes('&') || authors.includes('And') ? 2 : 1;
                     }
+
                     const title = toTitleCase(children[1].textContent?.trim() ?? "")
-
-
-
 
                     const excerpt = children[2].textContent?.trim() ?? "";
                     const excerpt_delimiter_index = excerpt.indexOf('. ');
@@ -47,6 +47,7 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
                         link,
                         display_string
                     }
+
                 } catch (e) {
                     console.error(e);
                     return;
