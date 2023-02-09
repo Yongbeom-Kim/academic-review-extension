@@ -1,4 +1,5 @@
-import ParserDriver, { ParsedUrl } from "./BaseParserDriver";
+import { ParsedUrl } from "../model/ParsedUrlObject";
+import ParserDriver from "./BaseParserDriver";
 import { toTitleCase } from "./utils/str_utils";
 
 export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
@@ -22,6 +23,7 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
                 return {authors, title, publication_type, pages, link, display_string}
             })
+            .map(ParsedUrl.parsePlainObject)
     }
 
 

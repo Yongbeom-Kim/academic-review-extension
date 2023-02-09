@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "class-transformer": "^0.5.1",
     "csstype": "^3.1.1",
     "function-bind": "^1.1.1",
     "has": "^1.0.3",
@@ -16,6 +17,7 @@
     "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "reflect-metadata": "^0.1.13",
     "resolve": "^1.22.1",
     "scheduler": "^0.23.0",
     "source-map-js": "^1.0.2",

@@ -1,4 +1,5 @@
-import ParserDriver, { ParsedUrl } from "./BaseParserDriver";
+import { ParsedUrl } from "../model/ParsedUrlObject";
+import ParserDriver from "./BaseParserDriver";
 
 export default class DefaultParserDriver implements ParserDriver {
     get_links(document: Document): ParsedUrl[] {
@@ -15,6 +16,7 @@ export default class DefaultParserDriver implements ParserDriver {
             })
             .filter(x => x.display_string?.length ?? 0 > 0)
             .filter(x => (x.link?.startsWith("https://") || x.link?.startsWith("http://") || x.link?.startsWith("www.")))
+            .map(ParsedUrl.parsePlainObject)
     }
     is_url(url: string): boolean {
         return true;

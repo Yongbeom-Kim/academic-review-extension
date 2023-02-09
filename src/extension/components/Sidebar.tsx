@@ -1,6 +1,8 @@
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { instanceToPlain } from 'class-transformer';
 import browser, { tabs } from 'webextension-polyfill';
-import ParserDriver, { ParsedUrl } from '../website_driver/BaseParserDriver';
+import { ParsedUrl } from '../model/ParsedUrlObject';
+import ParserDriver from '../website_driver/BaseParserDriver';
 import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
 import styles from './Sidebar.module.css';
@@ -21,10 +23,14 @@ export default function Sidebar() {
 
         // send message to create new window
         // received at src/extension/background_script/detect_browser_actions.ts
-        browser.runtime.sendMessage({
-            message: "start_review",
-            data: submitData
-        })
+        // browser.runtime.sendMessage({
+        //     message: "start_review",
+        //     data: submitData
+        // })
+        localStorage.setItem("data", JSON.stringify(instanceToPlain(siteLinkData)));
+
+        console.log("localstorage:");
+        console.log(localStorage.getItem("data"));
     }
 
 
