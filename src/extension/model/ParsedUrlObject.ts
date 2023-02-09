@@ -3,6 +3,7 @@ import { instanceToPlain, plainToClass } from 'class-transformer';
 
 
 export class ParsedUrl {
+    volume_no: string | undefined;
     authors: string | undefined;
     title: string | undefined;
     publication_type: string | undefined;
@@ -12,16 +13,6 @@ export class ParsedUrl {
 
     toPlainObject(): Object {
         return instanceToPlain(this);
-    }
-
-    /**
-     * We need this method because things like links have issue when exported to csv (for some reason?)
-     */
-    toExportableObject(): Record<any, any> {
-        return (
-            ({ authors, title, publication_type, pages, link }) =>
-                ({ authors, title, publication_type, pages, link }))
-            (this)
     }
 
     static parsePlainObject(obj: Object): ParsedUrl {
