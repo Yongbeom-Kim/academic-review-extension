@@ -21,6 +21,7 @@ export default function Sidebar() {
     const onFormSubmit = (e) => {
         const submitData = siteLinkData.filter((x, i) => checked[i]);
         console.log({ 'form_submit_data': submitData })
+        console.log(submitData.map(x => x.toExportableObject()))
 
         // @ts-ignore some type problems here, this is the correct type
         let submitDataPlainObj: Record<string, any>[] = instanceToPlain(submitData);
@@ -28,10 +29,10 @@ export default function Sidebar() {
         localStorage.removeItem('data');
         localStorage.setItem("data", JSON.stringify(submitDataPlainObj));
 
-        let csvContent = "data:text/csv;charset=utf-8," 
-            + objArrayToCsv(submitData.map(x => x.toExportableObject()))
-
-        window.open(encodeURI(csvContent));
+        let csvContent = objArrayToCsv(submitData.map(x => x.toExportableObject()))
+            
+        
+        window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
 
     }
 
