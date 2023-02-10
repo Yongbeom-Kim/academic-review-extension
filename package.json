@@ -37,7 +37,8 @@
     "webextension-polyfill": "^0.10.0"
   },
   "scripts": {
-    "build": "node ./scripts/esbuild.mjs"
+    "build": "node ./scripts/esbuild.mjs",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
