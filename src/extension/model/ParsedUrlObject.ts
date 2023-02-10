@@ -8,7 +8,7 @@ export class ParsedUrl {
     author_count: string | undefined;
     title: string | undefined;
     publication_type: string | undefined;
-    pages: string | undefined;
+    page_no: string | undefined;
     link: string | undefined;
     display_string: string | undefined;
 
