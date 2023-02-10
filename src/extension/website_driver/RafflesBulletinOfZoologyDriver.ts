@@ -18,8 +18,9 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
                     const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
 
                     const authors = toTitleCase(children[0].textContent?.trim() ?? "")
-                    let author_count;
 
+                    // TODO: refactor into a getAuthorCount()
+                    let author_count;
                     if (authors.includes(',')) {
                         author_count = authors.split(',').length + 1;
                     } else {
