@@ -21,3 +21,30 @@ export function objArrayToCsv(oa: Record<any, any>[]): string {
     console.log(str);
     return str;
 }
+
+/**
+ * Categorizes a string table with unknown columns to known columns via a series of predicate functions.
+ * @param data A 2-D string array to categorise (with unknown columns)
+ * @param columns An array of column headers to categorise string into
+ * @param column_predicate An array of predicates that return true if string belongs in said column, false otherwise.
+ * @returns the same data, but with column headers as the first row.
+ */
+export function categorizeStringTable(
+    data: string[][],
+    columns: string[],
+    column_predicate: ((arg0: string) => (boolean))
+): string[][] {
+    // TODO
+    return null;
+}
+
+/**
+ * Converts a 'table' of strings (2-D string array) with given columns into a JS plain object.
+ * @param columns an array of column headers
+ * @param table a 2-d array of strings
+ * @returns a JS object array
+ */
+export function tableToObject (columns: string[], table: string[][]): Record<string, string>[] {
+    // TODO
+    return null;    
+}
