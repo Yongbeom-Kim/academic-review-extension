@@ -1,9 +1,7 @@
-import { categorizeStringTable, tableToObject } from "../../../../src/extension/libs/utils/obj_utils";
+import { tableToObject } from "../../../../src/extension/libs/utils/obj_utils";
 import { expect, jest, test } from '@jest/globals';
 
 // categorizeStringTable
-// 
-// tableToObject
 
 /**
  * Test for @method tableToObject

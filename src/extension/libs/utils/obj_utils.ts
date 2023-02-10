@@ -29,14 +29,14 @@ export function objArrayToCsv(oa: Record<any, any>[]): string {
  * @param column_predicate An array of predicates that return true if string belongs in said column, false otherwise.
  * @returns the same data, but with column headers as the first row.
  */
-export function categorizeStringTable(
-    data: string[][],
-    columns: string[],
-    column_predicate: ((arg0: string) => (boolean))
-): string[][] {
-    // TODO
-    return null;
-}
+// export function categorizeStringTable(
+//     data: string[][],
+//     columns: string[],
+//     column_predicate: ((arg0: string) => (boolean))
+// ): string[][] {
+//     // TODO
+//     return null;
+// }
 
 /**
  * Converts a 'table' of strings (2-D string array) with given columns into a JS plain object.
