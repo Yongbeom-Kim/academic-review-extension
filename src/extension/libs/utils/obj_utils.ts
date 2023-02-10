@@ -40,11 +40,29 @@ export function categorizeStringTable(
 
 /**
  * Converts a 'table' of strings (2-D string array) with given columns into a JS plain object.
+ * Columns and table must have same number of columns
  * @param columns an array of column headers
  * @param table a 2-d array of strings
  * @returns a JS object array
  */
 export function tableToObject (columns: string[], table: string[][]): Record<string, string>[] {
-    // TODO
-    return null;    
+    if (table[0].length != columns.length)
+        throw new Error("Table and column must have same length")
+
+    for (let i = 0; i < table.length-1; i ++)
+        if (table[i].length != table[i+1].length)
+            throw new Error("All rows in table must have same length")
+    
+    if (new Set(columns).size != columns.length)
+        throw new Error("Column must not have duplicate headers")
+            
+    let result: Record<string, string>[]= []
+    table.forEach((row) => {
+        result.push({});
+        row.forEach((value, index) => {
+            result[result.length-1][columns[index]] = value;
+        })
+    })
+
+    return result;
 }
