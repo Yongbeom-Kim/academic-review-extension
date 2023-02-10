@@ -2,6 +2,8 @@
 
 This is a cross-browser extension to facilitate metadata research.
 
+Development is tracked [here](https://www.notion.so/Academic-Review-Extension-21e1266c34b044a9bff2e8627ec94127?pvs=4).
+
 ## Installation
 On Chrome,
 1. Download the latest zip file in the [releases page](https://github.com/Yongbeom-Kim/academic-review-extension/releases)
