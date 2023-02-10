@@ -19,42 +19,32 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
                     const authors = toTitleCase(children[0].textContent?.trim() ?? "")
 
-                    // TODO: refactor into a getAuthorCount()
-                    let author_count;
-                    if (authors.includes(',')) {
-                        author_count = authors.split(',').length + 1;
-                    } else {
-                        author_count = authors.includes('&') || authors.includes('And') ? 2 : 1;
-                    }
-
                     const title = toTitleCase(children[1].textContent?.trim() ?? "")
 
                     const excerpt = children[2].textContent?.trim() ?? "";
                     const excerpt_delimiter_index = excerpt.indexOf('. ');
                     const publication_type = excerpt?.slice(0, excerpt_delimiter_index)?.trim() ?? ""
-                    const pages = excerpt?.slice(excerpt_delimiter_index + 2)?.trim() ?? ""
+                    const page_no = excerpt?.slice(excerpt_delimiter_index + 2)?.trim() ?? ""
 
                     const link = children[3].getAttribute('href') ?? ""
 
                     const display_string = title.length != 0 ? title : authors
 
-                    return {
+                    return ParsedUrl.from ({
                         volume_no,
                         authors,
-                        author_count: author_count.toString(),
                         title,
                         publication_type,
-                        pages,
+                        page_no,
                         link,
                         display_string
-                    }
+                    })
 
                 } catch (e) {
                     console.error(e);
-                    return;
+                    return ParsedUrl.from({});
                 }
             })
-            .map(ParsedUrl.parsePlainObject)
     }
 
 
