@@ -71,5 +71,30 @@ export class DataFrame<T> {
         return new DataFrame(columns, data);
     }
 
+    static EMPTY_CSV_CELL = '""';
+    /**
+     * Get a CSV representation of the target dataframe.
+     * @returns a string
+     */
+    toCsvString(): string {
+        const header_str = this.headers
+            .map(header => header.replaceAll('"', '""'))
+            .map(header => '"' + header + '"')
+            .join(',')
+
+        const body_str = this.data
+            .map(row =>
+                row.map(cell => {
+                    if (cell === DataFrame.EMPTY_CELL) {
+                        return DataFrame.EMPTY_CSV_CELL;
+                    } else {
+                        return '"' + `${cell}`.replaceAll('"', '""')  + '"'
+                    }
+                }).join(',')
+            ).join('\n')
+
+        return header_str + '\n' + body_str;
+    }
+
 
 }

@@ -49,3 +49,26 @@ describe('test DataFrame.FromPlainObject method', () => {
         expect(DataFrame.FromPlainObject(input)).toEqual(expectedOutput);
     })
 })
+
+/**
+ * test @method toCsvString
+ */
+describe('test df.toCsvString', () => {
+    test('basic 1x2 csv file', () => {
+        const input = new DataFrame(['a', 'b'], [[1, 2], [1, 2]])
+        const expectedOutput = '"a","b"\n"1","2"\n"1","2"'
+        expect(input.toCsvString()).toBe(expectedOutput)
+    })
+
+    test('test empty cell', () => {
+        const input = new DataFrame(['a', 'b'], [[DataFrame.EMPTY_CELL, 2], [1, DataFrame.EMPTY_CELL]])
+        const expectedOutput = `"a","b"\n${DataFrame.EMPTY_CSV_CELL},"2"\n"1",${DataFrame.EMPTY_CSV_CELL}`
+        expect(input.toCsvString()).toBe(expectedOutput)
+    })
+
+    test('test quotes (")', () => {
+        const input = new DataFrame(['"a"', '"b"'], [['"1"', '"2"']])
+        const expectedOutput = '"""a""","""b"""\n"""1""","""2"""'
+        expect(input.toCsvString()).toBe(expectedOutput)
+    })
+})
