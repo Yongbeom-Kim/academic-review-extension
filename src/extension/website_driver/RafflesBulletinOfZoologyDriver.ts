@@ -1,50 +1,71 @@
 import { ParsedUrl } from "../model/ParsedUrlObject";
 import ParserDriver from "./BaseParserDriver";
 import { toTitleCase } from "../libs/utils/str_utils";
+import { categorizeStringTable } from "../libs/utils/obj_utils";
+
+// Array.from(document.querySelectorAll('div.publication-layout')).map(e => e.innerText.split(/\s*\n\s*/))
+
+const DOWNLOAD_PDF_HYPERLINK_TEXT = 'Download PDF'
+
+const PAGES_WITH_PP_REGEX = /Pp\. (\d+–\d+)/
+const PLAIN_PAGES_REGEX = /\d+–\d+/
+const EXCERPT_WITH_PAGES_REGEX = /([^\.]+)(?:\. )?(?:Pp\.|:) (\d+–\d+)/
+
+const IS_PAGES = (s: string) => PLAIN_PAGES_REGEX.test(s);
+const IS_PUBLICATION_TYPE = (s: string) => {
+    return s.startsWith('Taxonomy') ||
+    s.startsWith('Systematic') ||
+    s.startsWith('Conservation') ||
+    s.startsWith('Ecology') ||
+    s.startsWith('Perspective') ||
+    s.startsWith('Communication') ||
+    s.startsWith('Review') ||
+    s.startsWith('Erratum') ||
+    s.startsWith('Corrigendum')
+};
+const IS_AUTHOR = (s: string) => { // Authors are all in uppercase
+    return !(/[a-z]/.test(s))
+}
+const IS_LINK = (s: string) => s.startsWith("https://")
+const IS_TITLE = (s: string) => !(IS_PAGES(s) || IS_PUBLICATION_TYPE(s) || IS_AUTHOR(s) || IS_LINK(s))
+const IS_VOLUME_NUMBER = (s: string) => /\d+(?:\(\d+\))?/.test(s)
+
 
 export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     // Example: https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-63/
     static URL_REGEX = new RegExp("lkcnhm\.nus\.edu\.sg\/publications\/raffles-bulletin-of-zoology\/volumes\/");
-    static EXCERPT_REGEX = /Pp\. \d+–\d+\./;
 
     get_links(document: Document): ParsedUrl[] {
-        return Array.from(document.querySelectorAll('div.publication-layout'))
-            .map(node => {
-                // TODO: get rid of this
-                try {
+        const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
 
-                    const children = node.children
+        const elements = Array.from(document.querySelectorAll('div.publication-layout'));
+        const texts = elements.map((e, i) => {
+            const text_array: string[] = e.innerText.split(/\s*\n\s*/)
+                .map(s => s.trim())
+                .filter(s => s !== DOWNLOAD_PDF_HYPERLINK_TEXT);
 
-                    const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
+            // sometimes, text_array[2] is excerpt + pages
+            if (EXCERPT_WITH_PAGES_REGEX.test(text_array[2])) {
+                const matches = text_array[2].match(EXCERPT_WITH_PAGES_REGEX)!
+                text_array[2] = matches[1];
+                text_array.push(matches[2]);
+            }
 
-                    const authors = toTitleCase(children[0].textContent?.trim() ?? "")
+            const link = e.querySelector('a[href]')?.getAttribute('href') ?? ""
 
-                    const title = toTitleCase(children[1].textContent?.trim() ?? "")
+            text_array.push(volume_no)
+            text_array.push(link)
+            
+            return text_array;
+        }).filter(e => e.length === 6); // TODO: get rid of this filter by allowing for different table and column lengths in categorizeStringTable.
+        
+        const column_headers = ['volume_no', 'authors', 'title', 'publication_type', 'page_no', 'link'];
+        const column_header_predicates = [IS_VOLUME_NUMBER, IS_AUTHOR, IS_TITLE, IS_PUBLICATION_TYPE, IS_PAGES, IS_LINK]
 
-                    const excerpt = children[2].textContent?.trim() ?? "";
-                    const excerpt_delimiter_index = excerpt.indexOf('. ');
-                    const publication_type = excerpt?.slice(0, excerpt_delimiter_index)?.trim() ?? ""
-                    const page_no = excerpt?.slice(excerpt_delimiter_index + 2)?.trim() ?? ""
+        const categorized_texts = categorizeStringTable(texts, column_headers, column_header_predicates);
 
-                    const link = children[3].getAttribute('href') ?? ""
-
-                    const display_string = title.length != 0 ? title : authors
-
-                    return ParsedUrl.from ({
-                        volume_no,
-                        authors,
-                        title,
-                        publication_type,
-                        page_no,
-                        link,
-                        display_string
-                    })
-
-                } catch (e) {
-                    console.error(e);
-                    return ParsedUrl.from({});
-                }
-            })
+        console.log({categorized_texts})
+        return categorized_texts.map(ParsedUrl.from);
     }
 
 

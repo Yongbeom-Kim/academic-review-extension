@@ -29,20 +29,19 @@ export class ParsedUrl {
             title,
             publication_type,
             page_no,
-            link,
-            display_string
+            link
         }): ParsedUrl {
         let newObj = new ParsedUrl();
 
         newObj.volume_no = volume_no;
         newObj.authors = authors;
-        newObj.calculateAuthorNo();
         newObj.title = title;
         newObj.publication_type = publication_type;
         newObj.page_no = page_no;
-        newObj.link = link;
-        newObj.display_string = display_string;
-
+        newObj.link = link
+        
+        newObj.calculateAuthorNo();
+        newObj.setDisplayString();
         return newObj;
     }
 
@@ -52,6 +51,10 @@ export class ParsedUrl {
         } else {
             this.author_count = this.authors.includes('&') || this.authors.includes('And') ? 2 : 1;
         }
+    }
+
+    private setDisplayString() {
+        this.display_string = this.title ?? this.authors;
     }
 
 }
