@@ -8,7 +8,7 @@ import { DataFrame } from "../../model/DataFrame"
  * @returns csv string
  */
 export function objArrayToCsv(oa: Record<any, any>[]): string {
-    return DataFrame.FromPlainObject(oa).toCsvString();
+    return DataFrame.FromPlainObjectArray(oa).toCsvString();
 }
 
 const UNDEFINED_STR = '__undefined__'
@@ -90,22 +90,22 @@ export function tableToObject(columns: string[], table: (string | undefined)[][]
 
 
 /**
+ * @deprecated
+ * Use @method DataFrame.getMatchScore instead
  * Get a 'score' for each column of table on how well it matches to the column predicate.
  * @param table a 2d array of strings. undefined values will automatically return false on the predicate.
  * @param column_predicate an array of predicates (string) => bool
  * @returns an score on how well the column predicates match the table.
  */
 function get_predicate_score(table: (string | undefined)[][], column_predicate: ((arg0: string) => (boolean))[]): number {
-    const matches: number[] = Array(table[0].length).fill(0);
-    table.forEach((row) => {
-        row.forEach((val, i) => {
-            if (typeof val !== 'undefined' && (column_predicate[i] ?? (s => false))(val)) // need nullary to handle case if column prediate is too short
-                matches[i]++;
-        })
-    })
+    const columns = [];
+    for (let i = 0; i < column_predicate.length; i ++) {
+        columns.push(i.toString())
+    }
+    const pred_maps: Record<string, ((arg0: string) => boolean)> = {};
+    column_predicate.forEach((val,i) => pred_maps[i] = column_predicate[i]);
 
-    const scores = matches.map(value => value * 1.0 / table.length);
-    return scores.reduce((x, y) => x + y) * 1.0 / scores.length;
+    return DataFrame.CreateUnevenDF(columns, table)['getMatchScore'](pred_maps)
 }
 
 /**

@@ -33,7 +33,7 @@ describe('test DataFrame.FromPlainObject method', () => {
     test('objects with common keys', () => {
         const input = [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
         const expectedOutput = new DataFrame(['a', 'b', 'c'], [[1, 2, 3], [4, 5, 6]])
-        expect(DataFrame.FromPlainObject(input)).toEqual(expectedOutput);
+        expect(DataFrame.FromPlainObjectArray(input)).toEqual(expectedOutput);
     })
 
     test('objects with distinct keys', () => {
@@ -46,7 +46,7 @@ describe('test DataFrame.FromPlainObject method', () => {
             ]
         )
         //@ts-ignore
-        expect(DataFrame.FromPlainObject(input)).toEqual(expectedOutput);
+        expect(DataFrame.FromPlainObjectArray(input)).toEqual(expectedOutput);
     })
 })
 

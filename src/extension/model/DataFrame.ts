@@ -48,7 +48,7 @@ export class DataFrame<T> {
      * @param objects an array of plain objects to parse into a DataFrame.
      * @returns a DataFrame object.
      */
-    static FromPlainObject<T>(objects: Record<string, T>[]): DataFrame<T> {
+    static FromPlainObjectArray<T>(objects: Record<string, T>[]): DataFrame<T> {
         const columns: string[] = []
         objects.forEach(object => {
             Object.keys(object).forEach(key => {
@@ -88,7 +88,7 @@ export class DataFrame<T> {
                     if (cell === DataFrame.EMPTY_CELL) {
                         return DataFrame.EMPTY_CSV_CELL;
                     } else {
-                        return '"' + `${cell}`.replaceAll('"', '""')  + '"'
+                        return '"' + `${cell}`.replaceAll('"', '""') + '"'
                     }
                 }).join(',')
             ).join('\n')
@@ -96,8 +96,12 @@ export class DataFrame<T> {
         return header_str + '\n' + body_str;
     }
 
+    /**
+     * Get a JS Plain Object representation of the target dataframe
+     * @returns a object
+     */
     toPlainObjectArray(): Record<string, T>[] {
-        const result: Record<string, T>[]= []
+        const result: Record<string, T>[] = []
         this.data.forEach(row => {
             result.push({})
             row.forEach((cell, i) => {
@@ -107,6 +111,33 @@ export class DataFrame<T> {
         })
 
         return result;
+    }
+
+
+
+    /*
+        Dynamic column matching
+    */
+    /**
+     * 
+     * @param column_predicates 
+     * @returns a float score between 0 and 1
+     */
+    private getMatchScore(column_predicates: Record<string, ((arg0: T) => (boolean))>): number {
+        let matches = 0
+        
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                const cell = this.data[i][j]
+                if (cell === DataFrame.EMPTY_CELL)
+                    continue
+
+                if (column_predicates[this.headers[j]](cell))
+                    matches++
+            }
+        }
+
+        return matches * 1.0 / this.rows / this.cols;
     }
 
 
