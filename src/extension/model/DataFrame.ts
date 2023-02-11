@@ -96,5 +96,18 @@ export class DataFrame<T> {
         return header_str + '\n' + body_str;
     }
 
+    toPlainObjectArray(): Record<string, T>[] {
+        const result: Record<string, T>[]= []
+        this.data.forEach(row => {
+            result.push({})
+            row.forEach((cell, i) => {
+                if (cell !== DataFrame.EMPTY_CELL)
+                    result.at(-1)![this.headers[i]] = cell;
+            })
+        })
+
+        return result;
+    }
+
 
 }

@@ -1,6 +1,7 @@
 import { DataFrame } from "../../model/DataFrame"
 
 /**
+ * @deprecated - use DataFrame functions instead
  * Converts an array of plain objects to csv format
  * Assumes that each field of the object array is a string (or likewise primitive)
  * @param oa object array to be converted
@@ -75,6 +76,7 @@ export function categorizeStringTable(
 }
 
 /**
+ * @deprecated
  * Converts a 'table' of strings (2-D string array) with given columns into a JS plain object.
  * Columns and table must have same number of columns
  * @param columns an array of column headers
@@ -82,26 +84,8 @@ export function categorizeStringTable(
  * @returns a JS object array
  */
 export function tableToObject(columns: string[], table: (string | undefined)[][]): Record<string, string>[] {
-    // TODO: Support columns that are too long and too short
-    if (table[0].length != columns.length)
-        throw new Error("Table and column must have same length")
 
-    for (let i = 0; i < table.length - 1; i++)
-        if (table[i].length != table[i + 1].length)
-            throw new Error("All rows in table must have same length")
-
-    if (new Set(columns).size != columns.length)
-        throw new Error("Column must not have duplicate headers")
-
-    let result: Record<string, string>[] = []
-    table.forEach((row) => {
-        result.push({});
-        row.forEach((value, index) => {
-            result[result.length - 1][columns[index]] = value ?? "";
-        })
-    })
-
-    return result;
+    return new DataFrame(columns, table).toPlainObjectArray();
 }
 
 

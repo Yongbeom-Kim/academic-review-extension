@@ -72,3 +72,23 @@ describe('test df.toCsvString', () => {
         expect(input.toCsvString()).toBe(expectedOutput)
     })
 })
+
+/**
+ * Test for @method toPlainObjectArray
+ */
+describe('testing df.toPlainObjectArray method', () => {
+    test('parse data with only one row', () => {
+        const cols = ['1', '2', '3']
+        const data = [['a', 'b', 'c']]
+        const expected = [{ '1': 'a', '2': 'b', '3': 'c' }]
+        expect(new DataFrame(cols, data).toPlainObjectArray()).toEqual(expected);
+    })
+
+    test('parse data with only multiple rows', () => {
+        const cols = ['1', '2', '3']
+        const data = [['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']]
+        const expected = [{ '1': 'a', '2': 'b', '3': 'c' }, { '1': 'd', '2': 'e', '3': 'f' }, { '1': 'g', '2': 'h', '3': 'i' }]
+        expect(new DataFrame(cols, data).toPlainObjectArray()).toEqual(expected);
+    })
+
+})
