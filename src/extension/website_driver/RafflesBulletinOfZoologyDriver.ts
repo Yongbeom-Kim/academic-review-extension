@@ -14,14 +14,14 @@ const EXCERPT_WITH_PAGES_REGEX = /([^\.]+)(?:\. )?(?:Pp\.|:) (\d+–\d+)/
 const IS_PAGES = (s: string) => PLAIN_PAGES_REGEX.test(s);
 const IS_PUBLICATION_TYPE = (s: string) => {
     return s.startsWith('Taxonomy') ||
-    s.startsWith('Systematic') ||
-    s.startsWith('Conservation') ||
-    s.startsWith('Ecology') ||
-    s.startsWith('Perspective') ||
-    s.startsWith('Communication') ||
-    s.startsWith('Review') ||
-    s.startsWith('Erratum') ||
-    s.startsWith('Corrigendum')
+        s.startsWith('Systematic') ||
+        s.startsWith('Conservation') ||
+        s.startsWith('Ecology') ||
+        s.startsWith('Perspective') ||
+        s.startsWith('Communication') ||
+        s.startsWith('Review') ||
+        s.startsWith('Erratum') ||
+        s.startsWith('Corrigendum')
 };
 const IS_AUTHOR = (s: string) => { // Authors are all in uppercase
     return !(/[a-z]/.test(s))
@@ -55,16 +55,22 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
             text_array.push(volume_no)
             text_array.push(link)
-            
+
             return text_array;
-        }).filter(e => e.length === 6); // TODO: get rid of this filter by allowing for different table and column lengths in categorizeStringTable.
-        
+        });
+
         const column_headers = ['volume_no', 'authors', 'title', 'publication_type', 'page_no', 'link'];
         const column_header_predicates = [IS_VOLUME_NUMBER, IS_AUTHOR, IS_TITLE, IS_PUBLICATION_TYPE, IS_PAGES, IS_LINK]
 
         const categorized_texts = categorizeStringTable(texts, column_headers, column_header_predicates);
+        
+        // remove Pp. in pages
+        categorized_texts.forEach(row => {
+            if ("page_no" in row && PAGES_WITH_PP_REGEX.test(row.page_no))
+                row.page_no = row.page_no.match(PAGES_WITH_PP_REGEX)![1]
+        })
 
-        console.log({categorized_texts})
+        console.log({ categorized_texts })
         return categorized_texts.map(ParsedUrl.from);
     }
 
