@@ -24,19 +24,19 @@ export function objArrayToCsv(oa: Record<any, any>[]): string {
 
 /**
  * Categorizes a string table with unknown columns to known columns via a series of predicate functions.
- * @param data A 2-D string array to categorise (with unknown columns)
+ * @param table A 2-D string array to categorise (with unknown columns)
  * @param columns An array of column headers to categorise string into
  * @param column_predicate An array of predicates that return true if string belongs in said column, false otherwise.
  * @returns the same data, but with column headers as the first row.
  */
-// export function categorizeStringTable(
-//     data: string[][],
-//     columns: string[],
-//     column_predicate: ((arg0: string) => (boolean))
-// ): string[][] {
-//     // TODO
-//     return null;
-// }
+export function categorizeStringTable(
+    table: string[][],
+    columns: string[],
+    column_predicate: ((arg0: string) => (boolean))[]
+): string[][] {
+    // TODO
+    return [];
+}
 
 /**
  * Converts a 'table' of strings (2-D string array) with given columns into a JS plain object.
@@ -46,6 +46,7 @@ export function objArrayToCsv(oa: Record<any, any>[]): string {
  * @returns a JS object array
  */
 export function tableToObject (columns: string[], table: string[][]): Record<string, string>[] {
+    // TODO: Support columns that are too long and too short
     if (table[0].length != columns.length)
         throw new Error("Table and column must have same length")
 
