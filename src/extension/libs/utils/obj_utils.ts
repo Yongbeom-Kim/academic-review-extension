@@ -6,7 +6,6 @@
  */
 export function objArrayToCsv(oa: Record<any, any>[]): string {
     let headers = Object.keys(oa[0])
-    console.log({ oa });
 
     let str = headers.map(x => `"${x}"`).join(",");
     str += "\n";
@@ -17,8 +16,6 @@ export function objArrayToCsv(oa: Record<any, any>[]): string {
             .join(','))
         .join('\n');
 
-    console.log({ str });
-    console.log(str);
     return str;
 }
 
@@ -33,7 +30,7 @@ export function categorizeStringTable(
     table: string[][],
     columns: string[],
     column_predicate: ((arg0: string) => (boolean))[]
-): string[][] {
+): Record<string, string>[] {
     if (columns.length !== column_predicate.length)
         throw Error("column and column predicate array length must be the same")
     for (let i = 0; i < table.length - 1; i++)
@@ -45,8 +42,29 @@ export function categorizeStringTable(
     const column_predicate_mapping: Record<string, ((arg0: string) => (boolean))> = {};
     columns.forEach((val, i) => column_predicate_mapping[val] = column_predicate[i]);
 
-    return [];
+    let max_score = 0;
+    let max_columns: string[] = [];
+    permute(columns).forEach(column_permutation => {
+        const score = get_predicate_score(table, column_permutation.map(header => column_predicate_mapping[header]))
 
+        if (score > max_score) {
+            max_score = score;
+            max_columns = column_permutation
+        }
+    })
+
+    const result: Record<string, string>[] = Array(table.length);
+    for (let i = 0; i < table.length; i ++) {
+        result[i] = {};
+    }
+    
+    for (let i = 0; i < table.length; i++) {
+        for (let j = 0; j < max_columns.length; j ++) {
+            result[i][max_columns[j]] = table[i][j]
+        }
+    }
+
+    return result;
 
 }
 
@@ -85,10 +103,10 @@ export function tableToObject(columns: string[], table: string[][]): Record<stri
  * Get a 'score' for each column of table on how well it matches to the column predicate.
  * @param table a 2d array of strings
  * @param column_predicate an array of predicates (string) => bool
- * @returns an array on the fraction of values in each column that match the predicate for said column.
+ * @returns an score on how well the column predicates match the table.
  */
-function get_predicate_score(table: string[][], column_predicate: ((arg0: string) => (boolean))[]): number[] {
-    const matches = Array(10).fill(0);
+function get_predicate_score(table: string[][], column_predicate: ((arg0: string) => (boolean))[]): number {
+    const matches: number[] = Array(table[0].length).fill(0);
     table.forEach((row) => {
         row.forEach((val, i) => {
             if (column_predicate[i](val))
@@ -96,11 +114,13 @@ function get_predicate_score(table: string[][], column_predicate: ((arg0: string
         })
     })
 
-    return matches.map(value => value * 1.0 / table.length);
+    const scores = matches.map(value => value * 1.0 / table.length);
+    return scores.reduce((x, y) => x + y) * 1.0 / scores.length;
 }
 
 /**
- * Get all permutations of an array
+ * Get all permutations of an array]
+ * Uses heap's algorithm, as seen here: https://en.wikipedia.org/wiki/Heap's_algorithm
  * @param arr array to permute
  * @returns an array of permutations of said array
  */
@@ -109,21 +129,20 @@ function permute<T>(arr: T[]): T[][] {
     function permute_helper(k: number, A: T[]) {
         if (k === 1) {
             permutations.push(Array.from(A))
-            console.log(permutations)
         } else {
-            permute_helper(k-1, A)
+            permute_helper(k - 1, A)
 
-            for (let i = 0; i < k-1; i ++) {
-                if (k%2 == 0) {
+            for (let i = 0; i < k - 1; i++) {
+                if (k % 2 == 0) {
                     const temp = A[i]
-                    A[i] = A[k-1]
-                    A[k-1] = temp
+                    A[i] = A[k - 1]
+                    A[k - 1] = temp
                 } else {
                     const temp = A[0]
-                    A[0] = A[k-1]
-                    A[k-1] = temp
+                    A[0] = A[k - 1]
+                    A[k - 1] = temp
                 }
-                permute_helper(k-1, A)
+                permute_helper(k - 1, A)
             }
         }
     }
@@ -132,4 +151,4 @@ function permute<T>(arr: T[]): T[][] {
 
 }
 
-export const test_export = { permute }
+export const test_export = { permute, get_predicate_score }

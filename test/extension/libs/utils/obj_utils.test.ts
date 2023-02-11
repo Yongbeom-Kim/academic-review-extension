@@ -15,8 +15,9 @@ import {
     isBetween40to50,
 } from '../../../test_utils';
 
-const { permute } = test_export;
+const { permute, get_predicate_score } = test_export;
 
+const EPSILON = 0.000001
 /**
  * Test for @method permute
  */
@@ -40,6 +41,33 @@ describe('testing permute function', () => {
     })
 })
 
+/**
+ * test for @method get_predicate_score
+ */
+describe('testing get_predicate_score function', () => {
+    test('perfect match, 1 row', () => {
+        const table = [['0','1','2']]
+        const preds = [isZero, isOne, isTwo]
+        expect(get_predicate_score(table, preds)).toBe(1)
+    })
+    
+    test('imperfect match, 1 row', () => {
+        const table = [['0','1','1']]
+        const preds = [isZero, isOne, isTwo]
+        expect(get_predicate_score(table, preds)).toBeCloseTo(2/3, EPSILON)
+    })
+    test('no match, 1 row', () => {
+        const table = [['1','2','3']]
+        const preds = [isZero, isOne, isTwo]
+        expect(get_predicate_score(table, preds)).toBe(0)
+    })
+    test('perfect match, 3 row', () => {
+        const table = [['0','1','2'],['0','1','2'],['0','1','2']]
+        const preds = [isZero, isOne, isTwo]
+        expect(get_predicate_score(table, preds)).toBe(1)
+    })
+
+})
 
 /**
  * Test for @method categorizeStringTable
@@ -92,7 +120,7 @@ describe('testing categorizeStringTable function', () => {
 
     test('specific and general columns are matched correctly', () => {
         const cols = ['0', '1', '10']
-        const table = [['9', '0', '1'], ['0', '0', '1'], ['1', '0', '1']]
+        const table = [['9', '0', '1'], ['4', '0', '1'], ['1', '0', '1']]
         const preds = [isZero, isOne, isBetween0to10]
         const result = [{ '0': '0', '1': '1', '10': '9' }, { '0': '0', '1': '1', '10': '4' }, { '0': '0', '1': '1', '10': '1' }]
         expect(categorizeStringTable(table, cols, preds)).toEqual(result)
