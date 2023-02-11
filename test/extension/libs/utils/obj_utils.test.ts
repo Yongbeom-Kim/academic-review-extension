@@ -74,25 +74,40 @@ describe('testing get_predicate_score function', () => {
  */
 describe('testing categorizeStringTable function', () => {
 
-    test('column length < column predicate length throws error', () => {
+    test('column header length < column predicate length throws error', () => {
         const cols = ['0', '1', '2']
         const table = [['0', '1', '2']]
         const preds = [isZero, isOne, isTwo, isThree]
         expect(() => categorizeStringTable(table, cols, preds)).toThrow()
     })
 
-    test('column length > column predicate length throws error', () => {
+    test('column header length > column predicate length throws error', () => {
         const cols = ['0', '1', '2']
         const table = [['0', '1', '2']]
         const preds = [isZero, isOne]
         expect(() => categorizeStringTable(table, cols, preds)).toThrow()
     })
 
-    test('inconsistent table width throws error', () => {
+    test('handle table data width < column predicate', () => {
+        const cols = ['0', '1', '2', '3']
+        const table = [['2', '1', '0']]
+        const preds = [isZero, isOne, isTwo, isThree]
+        const expected = [{'0': '0', '1': '1', '2': '2'}]
+        expect(categorizeStringTable(table, cols, preds)).toEqual(expected)
+    })
+
+    test('handle table data width > column predicate length', () => {
+        const cols = ['0', '1']
+        const table = [['2', '0', '1']]
+        const preds = [isZero, isOne]
+        expect(categorizeStringTable(table, cols, preds)).toEqual([{'0':'0', '1':'1'}])
+    })
+
+    test('handle inconsistent table width', () => {
         const cols = ['0', '1', '2']
-        const table = [['0', '1', '2'], ['0', '1', '2'], ['0', '1', '2', '3']]
+        const table = [['2', '1', '0'], ['2', '1', '0'], ['2', '1', '0', '3']]
         const preds = [isZero, isOne, isTwo]
-        expect(() => categorizeStringTable(table, cols, preds)).toThrow()
+        expect(categorizeStringTable(table, cols, preds)).toEqual([{'0':'0', '1':'1', '2':'2'},{'0':'0', '1':'1', '2':'2'},{'0':'0', '1':'1', '2':'2'}])
     })
 
     test('column duplicate headers throws error', () => {
