@@ -25,19 +25,50 @@ export class DataFrame<T> {
      * If there are insufficient headers, throws an error.
      * @param headers headers for the table
      * @param data data for the table
+     * @returns a new DataFrame object.
      */
     static CreateUnevenDF<T>(headers: string[], data: (T | undefined)[][]): DataFrame<T> {
         let max_width = headers.length;
         data.forEach(row => max_width = Math.max(max_width, row.length))
         if (max_width > headers.length)
             throw new Error('max width of data cannot be greater than header length')
-        
+
         data.forEach(row => {
-            while(row.length < max_width)
+            while (row.length < max_width)
                 row.push(DataFrame.EMPTY_CELL)
         })
 
         return new DataFrame(headers, data)
+    }
+
+    /**
+     * Create a dataframe from an array of plain objects.
+     * Headers will be the collective union of all keys.
+     * Entries will be the values of each object (DataFrame.EMPTY_CELL if missing).
+     * @param objects an array of plain objects to parse into a DataFrame.
+     * @returns a DataFrame object.
+     */
+    static FromPlainObject<T>(objects: Record<string, T>[]): DataFrame<T> {
+        const columns: string[] = []
+        objects.forEach(object => {
+            Object.keys(object).forEach(key => {
+                if (!columns.includes(key))
+                    columns.push(key)
+            })
+        })
+
+        const data = objects.map(object => {
+            const row: (T | undefined)[] = []
+            columns.forEach(column => {
+                if (column in object)
+                    row.push(object[column])
+                else
+                    row.push(this.EMPTY_CELL)
+            })
+            return row;
+        })
+
+        return new DataFrame(columns, data);
     }
 
 
