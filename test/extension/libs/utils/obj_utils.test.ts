@@ -1,4 +1,4 @@
-import { categorizeStringTable, tableToObject } from "../../../../src/extension/libs/utils/obj_utils";
+import { categorizeStringTable, tableToObject, test_export } from "../../../../src/extension/libs/utils/obj_utils";
 import { expect, jest, test } from '@jest/globals';
 import {
     alwaysFalse,
@@ -14,6 +14,31 @@ import {
     isBetween30to40,
     isBetween40to50,
 } from '../../../test_utils';
+
+const { permute } = test_export;
+
+/**
+ * Test for @method permute
+ */
+describe('testing permute function', () => {
+    test('array length 1', () => {
+        expect(permute(['1']).sort()).toEqual([['1']].sort());
+    })
+    test('array length 2', () => {
+        expect(permute(['1', '2']).sort()).toEqual([['1', '2'], ['2', '1']].sort());
+    })
+    test('array length 3', () => {
+        const input = ['1', '2', '3'];
+        const expected =
+            [['1', '2', '3'],
+            ['1', '3', '2'],
+            ['2', '1', '3'],
+            ['2', '3', '1'],
+            ['3', '2', '1'],
+            ['3', '1', '2']]
+        expect(permute(input).sort()).toEqual(expected.sort());
+    })
+})
 
 
 /**
@@ -70,7 +95,7 @@ describe('testing categorizeStringTable function', () => {
         const table = [['9', '0', '1'], ['0', '0', '1'], ['1', '0', '1']]
         const preds = [isZero, isOne, isBetween0to10]
         const result = [{ '0': '0', '1': '1', '10': '9' }, { '0': '0', '1': '1', '10': '4' }, { '0': '0', '1': '1', '10': '1' }]
-        expect(categorizeStringTable(table,cols,preds)).toEqual(result)
+        expect(categorizeStringTable(table, cols, preds)).toEqual(result)
     })
 })
 
