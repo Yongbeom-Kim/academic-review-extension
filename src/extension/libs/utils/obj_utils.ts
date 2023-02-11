@@ -53,11 +53,13 @@ export function categorizeStringTable(
         }
     })
 
+    // convert table with headers to an array of objects
+    // TODO: abstract into separate function
     const result: Record<string, string>[] = Array(table.length);
     for (let i = 0; i < table.length; i ++) {
         result[i] = {};
     }
-    
+
     for (let i = 0; i < table.length; i++) {
         for (let j = 0; j < max_columns.length; j ++) {
             result[i][max_columns[j]] = table[i][j]
@@ -119,7 +121,7 @@ function get_predicate_score(table: string[][], column_predicate: ((arg0: string
 }
 
 /**
- * Get all permutations of an array]
+ * Get all permutations of an array
  * Uses heap's algorithm, as seen here: https://en.wikipedia.org/wiki/Heap's_algorithm
  * @param arr array to permute
  * @returns an array of permutations of said array
