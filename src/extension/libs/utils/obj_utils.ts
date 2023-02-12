@@ -13,6 +13,7 @@ export function objArrayToCsv(oa: Record<any, any>[]): string {
 
 const UNDEFINED_STR = '__undefined__'
 /**
+ * @deprecated
  * Categorizes a string table with unknown columns to known columns via a series of predicate functions.
  * @param table A 2-D string array to categorise (with unknown columns). Table shoud not have any undefined values
  * @param columns An array of column headers to categorise string into
@@ -26,53 +27,12 @@ export function categorizeStringTable(
 ): Record<string, string>[] {
     if (columns.length !== column_predicate.length)
         throw Error("column and column predicate array length must be the same")
-    if (new Set(columns).size !== columns.length)
-        throw Error("column cannot have duplicate headers")
-
-    // make table width consistent by adding undefined values
-    let table_width = columns.length
-    for (let i = 0; i < table.length; i++)
-        table_width = Math.max(table_width, table[i].length);
-
-    for (let i = 0; i < table.length; i++)
-        while (table[i].length < table_width)
-            table[i].push(undefined);
-
-    while (column_predicate.length < table_width)
-        column_predicate.push((s) => false)
-    while (columns.length < table_width)
-        columns.push(UNDEFINED_STR)
-
-    const column_predicate_mapping: Record<string, ((arg0: string) => (boolean))> = {};
-    columns.forEach((val, i) => column_predicate_mapping[val] = column_predicate[i]);
-
-    let max_score = 0;
-    let max_columns: string[] = [];
-    permute(columns).forEach(column_permutation => {
-        const score = get_predicate_score(table, column_permutation.map(header => column_predicate_mapping[header]))
-
-        if (score > max_score) {
-            max_score = score;
-            max_columns = column_permutation
-        }
-    })
-
-    // convert table with headers to an array of objects
-    // TODO: abstract into separate function
-    const result: Record<string, string>[] = Array(table.length);
-    for (let i = 0; i < table.length; i++) {
-        result[i] = {};
+    
+    const column_predicate_mapping: Record<string, (arg0: string) => (boolean)> = {};
+    for (let i = 0; i < columns.length; i ++) {
+        column_predicate_mapping[columns[i]] = column_predicate[i];
     }
-
-    for (let i = 0; i < table.length; i++)
-        for (let j = 0; j < table[i].length; j++) {
-            const temp_val = table[i][j] // for ts type checks
-            if (max_columns[j] !== UNDEFINED_STR && typeof temp_val !== 'undefined')
-                result[i][max_columns[j]] = temp_val;
-        }
-
-    return result;
-
+    return DataFrame.AutoHeaders(columns, table, column_predicate_mapping).toPlainObjectArray();
 }
 
 /**
@@ -114,7 +74,7 @@ function get_predicate_score(table: (string | undefined)[][], column_predicate: 
  * @param arr array to permute
  * @returns an array of permutations of said array
  */
-function permute<T>(arr: T[]): T[][] {
+export function permute<T>(arr: T[]): T[][] {
     const permutations: T[][] = []
     function permute_helper(k: number, A: T[]) {
         if (k === 1) {

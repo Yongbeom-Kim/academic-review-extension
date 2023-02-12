@@ -1,3 +1,4 @@
+import { permute } from '../libs/utils/obj_utils';
 /**
  * A DataFrame class - an abstraction of a table of data with headers.
  */
@@ -13,6 +14,9 @@ export class DataFrame<T> {
         for (let i = 0; i < data.length; i++)
             if (headers.length !== data[i].length)
                 throw new Error("headers and data width is inconsistent");
+            
+        if (new Set(headers).size != headers.length)
+            throw new Error("Column headers cannot have duplicate");
 
         this.headers = headers;
         this.data = data;
@@ -119,13 +123,39 @@ export class DataFrame<T> {
         Dynamic column matching
     */
     /**
+     * Automatically match column headers to table, given headers, data, and a set of predicate functions.
+     * @param column_headers an array of column headers
+     * @param data a 2-d array of data
+     * @param column_header_predicates a plain object of headers mapped to predicate functions 
+     */
+    static AutoHeaders<T>(
+        column_headers: string[],
+        data: (T | undefined)[][],
+        column_header_predicates: Record<string, ((arg0: T) => (boolean))>
+    ): DataFrame<T> {
+        let maxScore = 0;
+        let best_match: DataFrame<T>;
+
+        permute(column_headers).forEach(column_headers => {
+            const df = DataFrame.CreateUnevenDF(column_headers, data);
+            const score = df.getMatchScore(column_header_predicates);
+            if (score > maxScore) {
+                best_match = df;
+                maxScore = score;
+            }
+        })
+
+        return best_match!;
+    }
+
+    /**
      * 
      * @param column_predicates 
      * @returns a float score between 0 and 1
      */
     private getMatchScore(column_predicates: Record<string, ((arg0: T) => (boolean))>): number {
         let matches = 0
-        
+
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
                 const cell = this.data[i][j]

@@ -97,18 +97,19 @@ describe('testing categorizeStringTable function', () => {
         expect(categorizeStringTable(table, cols, preds)).toEqual(expected)
     })
 
-    test('handle table data width > column predicate length', () => {
+    test('table data width > column predicate length throws error', () => {
         const cols = ['0', '1']
         const table = [['2', '0', '1']]
         const preds = [isZero, isOne]
-        expect(categorizeStringTable(table, cols, preds)).toEqual([{'0':'0', '1':'1'}])
+        // expect(categorizeStringTable(table, cols, preds)).toEqual([{'0':'0', '1':'1'}])
+        expect(() => categorizeStringTable(table, cols, preds)).toThrow();
     })
 
     test('handle inconsistent table width', () => {
         const cols = ['0', '1', '2']
-        const table = [['2', '1', '0'], ['2', '1', '0'], ['2', '1', '0', '3']]
+        const table = [['2', '1', '0'], ['2', '1', '0'], ['2']]
         const preds = [isZero, isOne, isTwo]
-        expect(categorizeStringTable(table, cols, preds)).toEqual([{'0':'0', '1':'1', '2':'2'},{'0':'0', '1':'1', '2':'2'},{'0':'0', '1':'1', '2':'2'}])
+        expect(categorizeStringTable(table, cols, preds)).toEqual([{'0':'0', '1':'1', '2':'2'},{'0':'0', '1':'1', '2':'2'},{'2':'2'}])
     })
 
     test('column duplicate headers throws error', () => {
