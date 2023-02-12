@@ -31,6 +31,13 @@ export default function Sidebar() {
         localStorage.removeItem('data');
         localStorage.setItem("data", JSON.stringify(submitDataPlainObj));
 
+        const ORDERING = ['volume_no', 'year', 'authors', 'author_count', 'title',  'page_no', 'publication_type', 'keywords', 'countries', 'link', 'display_string'];
+        ORDERING.forEach(col => {
+            if (!submitData.headers.includes(col))
+                submitData.pushEmptyColumn(col);    
+        })
+
+        submitData.reorderColumns(ORDERING);
         let csvContent = submitData.toCsvString();
 
         console.log({csvContent});
