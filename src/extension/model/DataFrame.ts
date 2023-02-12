@@ -1,4 +1,5 @@
 import { permute } from '../libs/utils/obj_utils';
+import { isEqual } from "lodash";
 /**
  * A DataFrame class - an abstraction of a table of data with headers.
  */
@@ -203,8 +204,35 @@ export class DataFrame<T> {
         this.calculate_dimensions();
     }
 
+    /**
+     * Reorder the columns target dataframe with the new headers provided.
+     * New headers must be the same (except ordering) as the old headers
+     * @param new_column_ordering array of headers to reorder by
+     */
     reorderColumns(new_column_ordering: string[]): void {
+        if (!isEqual(new_column_ordering.slice().sort(), this.headers.slice().sort()))
+            throw new Error("column ordering does not match table")
 
+        const mapping: Record<number, number> = {}
+        for (let i = 0; i < this.cols; i++) {
+            mapping[i] = new_column_ordering.indexOf(this.headers[i])
+        }
+
+        const newData = this.copy().data // wasteful, but easy
+
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                newData[i][j] = DataFrame.EMPTY_CELL
+            }
+        }
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                newData[i][mapping[j]] = this.data[i][j]
+            }
+        }
+
+        this.data = newData;
+        this.headers = new_column_ordering;
     }
 
     /**

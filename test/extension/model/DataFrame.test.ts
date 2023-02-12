@@ -159,3 +159,32 @@ describe('test df.transform', () => {
         expect(df).toEqual(expected_df);
     })
 })
+
+/**
+ * Test for @method reorderColumns
+ */
+describe('test df.reorderColumns', () => {
+
+    test('throw error on too few column names', () => {
+        const test_df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        expect(() => test_df.reorderColumns(['1', '3'])).toThrow();
+    })
+
+    test('throw error on too many column names', () => {
+        const test_df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        expect(() => test_df.reorderColumns(['1', '2', '3', '4'])).toThrow();
+    })
+
+    test('throw error on column name not found', () => {
+        const test_df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        expect(() => test_df.reorderColumns(['1', '2', '4'])).toThrow();
+    })
+
+    test('proper rearrangement', () => {
+        const test_df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        const expected_df = new DataFrame(['3', '1', '2'], [[3, 1, 2], [6, 4, 5]])
+        test_df.reorderColumns(['3','1','2']);
+        expect(test_df).toEqual(expected_df);
+    })
+
+})
