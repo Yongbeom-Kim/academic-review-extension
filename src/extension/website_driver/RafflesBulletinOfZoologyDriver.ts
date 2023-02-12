@@ -67,7 +67,6 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
             text_array.push(volume_no)
             text_array.push(link)
 
-            console.log({ text_array })
             return text_array;
         });
 
@@ -80,19 +79,8 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
                         return str
                 })
 
-        console.log(df.toPlainObjectArray())
         return df.toPlainObjectArray().map(ParsedUrl.from)
 
-        // const categorized_texts = categorizeStringTable(texts, column_headers, column_header_predicates);
-
-        // // remove Pp. in pages
-        // categorized_texts.forEach(row => {
-        //     if ("page_no" in row && PAGES_WITH_PP_REGEX.test(row.page_no))
-        //         row.page_no = row.page_no.match(PAGES_WITH_PP_REGEX)![1]
-        // })
-
-        // console.log({ categorized_texts })
-        // return categorized_texts.map(ParsedUrl.from);
     }
 
 
