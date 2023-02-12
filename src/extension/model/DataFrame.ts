@@ -31,7 +31,7 @@ export class DataFrame<T> {
      * @param data data for the table
      * @returns a new DataFrame object.
      */
-    static CreateUnevenDF<T>(headers: string[], data: (T | undefined)[][]): DataFrame<T> {
+    static Uneven<T>(headers: string[], data: (T | undefined)[][]): DataFrame<T> {
         let max_width = headers.length;
         data.forEach(row => max_width = Math.max(max_width, row.length))
         if (max_width > headers.length)
@@ -137,7 +137,7 @@ export class DataFrame<T> {
         let best_match: DataFrame<T>;
 
         permute(column_headers).forEach(column_headers => {
-            const df = DataFrame.CreateUnevenDF(column_headers, data);
+            const df = DataFrame.Uneven(column_headers, data);
             const score = df.getMatchScore(column_header_predicates);
             if (score > maxScore) {
                 best_match = df;
@@ -170,5 +170,29 @@ export class DataFrame<T> {
         return matches * 1.0 / this.rows / this.cols;
     }
 
+    copy(): DataFrame<T> {
+        return DataFrame.FromPlainObjectArray(this.toPlainObjectArray());
+    }
+
+    /**
+     * Applies a function onto one column of a dataframe, and returns a copy.
+     * @param column_name column to apply function onto
+     * @param map_fn function to apply
+     * @returns a copy of the dataframe
+     */
+    colMap(column_name: string, map_fn: ((arg0: T) => T | undefined)): DataFrame<T> {
+        const index = this.headers.indexOf(column_name);
+        const newDf = this.copy();
+        if (index == -1)
+            throw new Error("column name not in table")
+        
+            newDf.data.forEach(row => {
+            const cell = row[index]
+            if (cell !== DataFrame.EMPTY_CELL)
+                row[index] = map_fn(cell)
+        })
+
+        return newDf;
+    }
 
 }

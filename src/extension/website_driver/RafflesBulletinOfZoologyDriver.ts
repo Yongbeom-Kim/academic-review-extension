@@ -2,16 +2,17 @@ import { ParsedUrl } from "../model/ParsedUrlObject";
 import ParserDriver from "./BaseParserDriver";
 import { toTitleCase } from "../libs/utils/str_utils";
 import { categorizeStringTable } from "../libs/utils/obj_utils";
+import { DataFrame } from "../model/DataFrame";
 
 // Array.from(document.querySelectorAll('div.publication-layout')).map(e => e.innerText.split(/\s*\n\s*/))
 
 const DOWNLOAD_PDF_HYPERLINK_TEXT = 'Download PDF'
 
-const PLAIN_PAGES_REGEX = /\d+(?:-|–)\d+/
-const PAGES_WITH_PP_REGEX = new RegExp(`Pp\\.\\s(${PLAIN_PAGES_REGEX.source})`)
-const EXCERPT_WITH_PAGES_REGEX = /([^\.]+)(?:\. )?(?:Pp\.|:) (\d+–\d+)/
+const PLAIN_PAGES_REGEX = new RegExp("\\d+(?:-|–)\\d+" + "|" + "\\d+")
+const PAGES_WITH_PP_REGEX = new RegExp("Pp(?:\\.|:)\\s(\\d+(?:-|–)\\d+)" + "|" + "P(?:\\.|:)\\s(\\d+)")
+const EXCERPT_WITH_PAGES_REGEX = new RegExp("([^\\.]+)(?:\\. )?" + `(${PAGES_WITH_PP_REGEX.source})`)
 
-const IS_PAGES = (s: string) => PLAIN_PAGES_REGEX.test(s);
+const IS_PAGES = (s: string) => PLAIN_PAGES_REGEX.test(s) || PAGES_WITH_PP_REGEX.test(s);
 const IS_PUBLICATION_TYPE = (s: string) => {
     return s.startsWith('Taxonomy') ||
         s.startsWith('Systematic') ||
@@ -30,6 +31,16 @@ const IS_LINK = (s: string) => s.startsWith("https://")
 const IS_TITLE = (s: string) => !(IS_PAGES(s) || IS_PUBLICATION_TYPE(s) || IS_AUTHOR(s) || IS_LINK(s))
 const IS_VOLUME_NUMBER = (s: string) => !s.startsWith("Pp.") && /\d+(?:\(\d+\))?/.test(s)
 
+const DATA_CATEGORIES = ['volume_no', 'authors', 'title', 'publication_type', 'page_no', 'link'];
+
+const DATA_CATEGORY_PREDICATES = {
+    'volume_no': IS_VOLUME_NUMBER,
+    'authors': IS_AUTHOR,
+    'title': IS_TITLE,
+    'publication_type': IS_PUBLICATION_TYPE,
+    'page_no': IS_PAGES,
+    'link': IS_LINK
+}
 
 export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     // Example: https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-63/
@@ -55,24 +66,33 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
             text_array.push(volume_no)
             text_array.push(link)
-            
-            console.log({text_array})
+
+            console.log({ text_array })
             return text_array;
         });
 
-        const column_headers = ['volume_no', 'authors', 'title', 'publication_type', 'page_no', 'link'];
-        const column_header_predicates = [IS_VOLUME_NUMBER, IS_AUTHOR, IS_TITLE, IS_PUBLICATION_TYPE, IS_PAGES, IS_LINK]
+        const df =
+            DataFrame.AutoHeaders(DATA_CATEGORIES, texts, DATA_CATEGORY_PREDICATES)
+                .colMap('page_no', str => { // Get rid of Pp. and P. in pages
+                    if (PAGES_WITH_PP_REGEX.test(str))
+                        return str.match(PAGES_WITH_PP_REGEX)![1]
+                    else
+                        return str
+                })
 
-        const categorized_texts = categorizeStringTable(texts, column_headers, column_header_predicates);
-        
-        // remove Pp. in pages
-        categorized_texts.forEach(row => {
-            if ("page_no" in row && PAGES_WITH_PP_REGEX.test(row.page_no))
-                row.page_no = row.page_no.match(PAGES_WITH_PP_REGEX)![1]
-        })
+        console.log(df.toPlainObjectArray())
+        return df.toPlainObjectArray().map(ParsedUrl.from)
 
-        console.log({ categorized_texts })
-        return categorized_texts.map(ParsedUrl.from);
+        // const categorized_texts = categorizeStringTable(texts, column_headers, column_header_predicates);
+
+        // // remove Pp. in pages
+        // categorized_texts.forEach(row => {
+        //     if ("page_no" in row && PAGES_WITH_PP_REGEX.test(row.page_no))
+        //         row.page_no = row.page_no.match(PAGES_WITH_PP_REGEX)![1]
+        // })
+
+        // console.log({ categorized_texts })
+        // return categorized_texts.map(ParsedUrl.from);
     }
 
 

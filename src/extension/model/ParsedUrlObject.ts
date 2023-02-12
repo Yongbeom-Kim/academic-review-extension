@@ -40,7 +40,6 @@ export class ParsedUrl {
         newObj.page_no = page_no;
         newObj.link = link
         
-        newObj.calculateAuthorNo();
         newObj.setDisplayString();
         return newObj;
     }

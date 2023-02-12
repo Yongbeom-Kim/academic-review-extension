@@ -8,7 +8,7 @@ describe('test DataFrame.CreateUnevenDF method', () => {
         const headers = ['a', 'b', 'c']
         const data = [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
         const expected = new DataFrame(headers, data)
-        expect(DataFrame.CreateUnevenDF(headers, data)).toEqual(expected)
+        expect(DataFrame.Uneven(headers, data)).toEqual(expected)
     })
 
     test('jagged table with missing values', () => {
@@ -16,13 +16,13 @@ describe('test DataFrame.CreateUnevenDF method', () => {
         const data = [[1, 2, 3], [1], [1, 2]]
         const expected_data = [[1, 2, 3], [1, DataFrame.EMPTY_CELL, DataFrame.EMPTY_CELL], [1, 2, DataFrame.EMPTY_CELL]]
         const expected = new DataFrame(headers, expected_data)
-        expect(DataFrame.CreateUnevenDF(headers, data)).toEqual(expected)
+        expect(DataFrame.Uneven(headers, data)).toEqual(expected)
     })
 
     test('too few headers throw an error', () => {
         const headers = ['a', 'b', 'c']
         const data = [[1, 2, 3], [1], [1, 2, 3, 4]]
-        expect(() => DataFrame.CreateUnevenDF(headers, data)).toThrow()
+        expect(() => DataFrame.Uneven(headers, data)).toThrow()
     })
 })
 
@@ -91,4 +91,39 @@ describe('testing df.toPlainObjectArray method', () => {
         expect(new DataFrame(cols, data).toPlainObjectArray()).toEqual(expected);
     })
 
+})
+
+/**
+ * Test for @method copy
+ */
+describe('test df.copy', () => {
+    test('test deep copy', () => {
+        const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        const testDfCopy = testDf.copy()
+        testDfCopy.data[0][0] = -5;
+        expect(testDf).toEqual(new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]]))
+    })
+})
+/**
+ * Test for @method colMap
+ */
+describe('test df.colMap', () => {
+    test('column name not found throws error', () => {
+        const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        expect(() => testDf.colMap('4', x => x + 1)).toThrow()
+    })
+    test('erraneous function throws error', () => {
+        const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        expect(() => testDf.colMap('2', x => { throw new Error() })).toThrow()
+    })
+    test('normal', () => {
+        const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        const expectedDf = new DataFrame(['1', '2', '3'], [[1, 2, 5], [4, 5, 8]])
+        expect(testDf.colMap('3', x => x + 2)).toEqual(expectedDf)
+    })
+    test('handle empty cells', () => {
+        const testDf = DataFrame.Uneven(['1', '2', '3'], [[1, 2, 3], [4, 5]])
+        const expectedDf = DataFrame.Uneven(['1', '2', '3'], [[1, 2, 5], [4, 5]])
+        expect(testDf.colMap('3', x => x + 2)).toEqual(expectedDf)
+    })
 })

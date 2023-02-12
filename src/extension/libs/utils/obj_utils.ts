@@ -65,7 +65,7 @@ function get_predicate_score(table: (string | undefined)[][], column_predicate: 
     const pred_maps: Record<string, ((arg0: string) => boolean)> = {};
     column_predicate.forEach((val,i) => pred_maps[i] = column_predicate[i]);
 
-    return DataFrame.CreateUnevenDF(columns, table)['getMatchScore'](pred_maps)
+    return DataFrame.Uneven(columns, table)['getMatchScore'](pred_maps)
 }
 
 /**
