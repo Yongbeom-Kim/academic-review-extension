@@ -1,7 +1,5 @@
 import { ParsedUrl } from "../model/ParsedUrlObject";
 import ParserDriver from "./BaseParserDriver";
-import { toTitleCase } from "../libs/utils/str_utils";
-import { categorizeStringTable } from "../libs/utils/obj_utils";
 import { DataFrame } from "../model/DataFrame";
 
 // Array.from(document.querySelectorAll('div.publication-layout')).map(e => e.innerText.split(/\s*\n\s*/))
@@ -42,12 +40,25 @@ const DATA_CATEGORY_PREDICATES = {
     'link': IS_LINK
 }
 
+const get_author_count = (s: string) => {
+    const authors = s.trim().split(/\s*(and|&|i)\s*/)
+    let author_count = 0;
+
+    authors.forEach(author => {
+        if (!(/\s/).test(author)) // only one word is not an author (e.g. Frank, Tom & Billy Bob is only 2)
+            return
+        
+        author_count ++;
+    })
+
+    return author_count;
+}
+
 export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     // Example: https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-63/
     static URL_REGEX = new RegExp("lkcnhm\.nus\.edu\.sg\/publications\/raffles-bulletin-of-zoology\/volumes\/");
 
     get_links(document: Document): ParsedUrl[] {
-        // const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
         const volume_no = document.URL.split("/").filter(s => s !== '').at(-1)?.slice(7) ?? ""
         const elements = Array.from(document.querySelectorAll('div.publication-layout'));
         const texts = elements.map((e, i) => {
@@ -72,12 +83,12 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
         const df =
             DataFrame.AutoHeaders(DATA_CATEGORIES, texts, DATA_CATEGORY_PREDICATES)
-                .colMap('page_no', str => { // Get rid of Pp. and P. in pages
-                    if (PAGES_WITH_PP_REGEX.test(str))
-                        return str.match(PAGES_WITH_PP_REGEX)![1]
-                    else
-                        return str
-                })
+        df.transform('page_no', 'page_no', str => { // Get rid of Pp. and P. in pages
+            if (PAGES_WITH_PP_REGEX.test(str))
+                return str.match(PAGES_WITH_PP_REGEX)![1]
+            else
+                return str
+        })
 
         return df.toPlainObjectArray().map(ParsedUrl.from)
 

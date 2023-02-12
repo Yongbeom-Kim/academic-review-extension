@@ -26,6 +26,7 @@ export class ParsedUrl {
         ({
             volume_no,
             authors,
+            author_count,
             title,
             publication_type,
             page_no,
@@ -39,17 +40,10 @@ export class ParsedUrl {
         newObj.publication_type = publication_type;
         newObj.page_no = page_no;
         newObj.link = link
+        newObj.author_count = author_count;
         
         newObj.setDisplayString();
         return newObj;
-    }
-
-    private calculateAuthorNo() {
-        if (this.authors.includes(',')) {
-            this.author_count = this.authors.split(',').length + 1;
-        } else {
-            this.author_count = this.authors.includes('&') || this.authors.includes('And') ? 2 : 1;
-        }
     }
 
     private setDisplayString() {

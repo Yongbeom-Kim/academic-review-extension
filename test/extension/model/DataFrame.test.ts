@@ -105,25 +105,57 @@ describe('test df.copy', () => {
     })
 })
 /**
- * Test for @method colMap
+ * Test for @method transform
  */
-describe('test df.colMap', () => {
-    test('column name not found throws error', () => {
+describe('test df.transform', () => {
+    test('src column name not found throws error', () => {
         const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        expect(() => testDf.colMap('4', x => x + 1)).toThrow()
+        expect(() => testDf.transform('4', '2', x => x + 1)).toThrow()
+    })
+    test('dst column name not found is added', () => {
+        const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        const expectedDf = new DataFrame(['1', '2', '3', '4'], [[1, 2, 3, 4], [4, 5, 6, 7]])
+        testDf.transform('3', '4', x => x + 1)
+        expect(testDf).toEqual(expectedDf)
     })
     test('erraneous function throws error', () => {
         const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        expect(() => testDf.colMap('2', x => { throw new Error() })).toThrow()
+        expect(() => testDf.transform('2', '2', x => { throw new Error() })).toThrow()
     })
-    test('normal', () => {
+    test('normal transform', () => {
         const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        const expectedDf = new DataFrame(['1', '2', '3'], [[1, 2, 5], [4, 5, 8]])
-        expect(testDf.colMap('3', x => x + 2)).toEqual(expectedDf)
+        const expectedDf = new DataFrame(['1', '2', '3'], [[5, 2, 3], [8, 5, 6]])
+        testDf.transform('3', '1', x => x + 2)
+        expect(testDf).toEqual(expectedDf)
     })
     test('handle empty cells', () => {
         const testDf = DataFrame.Uneven(['1', '2', '3'], [[1, 2, 3], [4, 5]])
         const expectedDf = DataFrame.Uneven(['1', '2', '3'], [[1, 2, 5], [4, 5]])
-        expect(testDf.colMap('3', x => x + 2)).toEqual(expectedDf)
+        testDf.transform('3', '3', x => x + 2)
+        expect(testDf).toEqual(expectedDf)
+    })
+})
+
+/**
+ * Test for @method pushEmptyColumn
+ */
+
+describe('test df.transform', () => {
+    test('adding existing column throws error', () => {
+        const cols = ['a', 'b', 'c']
+        const data = [[1, 2, 3], [4, 5, 6]]
+        const df = new DataFrame(cols, data);
+        expect(() => df.pushEmptyColumn('a')).toThrow();
+    })
+
+    test('add new column', () => {
+        const cols = ['a', 'b', 'c']
+        const data = [[1, 2, 3], [4, 5, 6]]
+        const df = new DataFrame(cols, data);
+        const expected_cols = ['a', 'b', 'c', 'd']
+        const expected_data = [[1, 2, 3, DataFrame.EMPTY_CELL], [4, 5, 6, DataFrame.EMPTY_CELL]]
+        const expected_df = new DataFrame(expected_cols, expected_data)
+        df.pushEmptyColumn('d')
+        expect(df).toEqual(expected_df);
     })
 })

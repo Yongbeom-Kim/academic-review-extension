@@ -14,7 +14,7 @@ export class DataFrame<T> {
         for (let i = 0; i < data.length; i++)
             if (headers.length !== data[i].length)
                 throw new Error("headers and data width is inconsistent");
-            
+
         if (new Set(headers).size != headers.length)
             throw new Error("Column headers cannot have duplicate");
 
@@ -170,29 +170,76 @@ export class DataFrame<T> {
         return matches * 1.0 / this.rows / this.cols;
     }
 
+    /**
+     * Get a shallow copy of the dataframe
+     * @returns a copy of the dataframe
+     */
     copy(): DataFrame<T> {
         return DataFrame.FromPlainObjectArray(this.toPlainObjectArray());
     }
 
     /**
-     * Applies a function onto one column of a dataframe, and returns a copy.
+     * Applies a function onto one column of a dataframe
      * @param column_name column to apply function onto
      * @param map_fn function to apply
-     * @returns a copy of the dataframe
      */
-    colMap(column_name: string, map_fn: ((arg0: T) => T | undefined)): DataFrame<T> {
-        const index = this.headers.indexOf(column_name);
-        const newDf = this.copy();
-        if (index == -1)
-            throw new Error("column name not in table")
-        
-            newDf.data.forEach(row => {
-            const cell = row[index]
-            if (cell !== DataFrame.EMPTY_CELL)
-                row[index] = map_fn(cell)
-        })
-
-        return newDf;
+    apply(column_name: string, fn: ((arg0: T) => T | undefined)): void {
+        this.transform(column_name, column_name, fn);
     }
 
+    /**
+     * Append an empty column to the dataframe
+     * @param new_col column name to append
+     */
+    pushEmptyColumn(new_col: string): void {
+        if (this.headers.includes(new_col))
+            throw new Error("Column already exists")
+
+        this.headers.push(new_col);
+        this.data.forEach(row => {
+            row.push(DataFrame.EMPTY_CELL)
+        })
+
+        this.calculate_dimensions();
+    }
+
+    reorderColumns(new_column_ordering: string[]): void {
+
+    }
+
+    /**
+     * Transform a column into another column of the dataframe.
+     * Source column remains intact.
+     * If destination column is not found in df, it is added.
+     * @param column_src Source column header to transform.
+     * @param column_dst Destination column header to transform.
+     * @param fn function to transform src to dst.
+     */
+    transform(column_src: string, column_dst: string, fn: ((arg0: T) => (T | undefined))): void {
+        const src_index = this.headers.indexOf(column_src);
+        let dst_index = this.headers.indexOf(column_dst);
+        if (src_index == -1)
+            throw new Error("column name not in table")
+
+        if (dst_index == -1) {
+            this.pushEmptyColumn(column_dst)
+            dst_index = this.headers.indexOf(column_dst);
+        }
+
+        this.data.forEach(row => {
+            const cell = row[src_index]
+            if (cell !== DataFrame.EMPTY_CELL)
+                row[dst_index] = fn(cell)
+        })
+    }
+
+    private calculate_dimensions() {
+        this.cols = this.headers.length;
+        this.rows = this.data.length;
+
+        this.data.forEach(row => {
+            if (row.length != this.cols)
+                throw new Error("Inconsistent table width");
+        })
+    }
 }
