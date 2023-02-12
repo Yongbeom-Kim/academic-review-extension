@@ -40,20 +40,7 @@ const DATA_CATEGORY_PREDICATES = {
     'link': IS_LINK
 }
 
-// TODO: abstract into a utils module and add tests
-const get_author_count = (s: string) => {
-    const authors = s.trim().split(/\s*(and|&|i)\s*/)
-    let author_count = 0;
 
-    authors.forEach(author => {
-        if (!(/\s/).test(author)) // only one word is not an author (e.g. Frank, Tom & Billy Bob is only 2)
-            return
-        
-        author_count ++;
-    })
-
-    return author_count;
-}
 
 export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     // Example: https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-63/
