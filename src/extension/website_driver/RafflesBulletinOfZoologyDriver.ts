@@ -40,6 +40,7 @@ const DATA_CATEGORY_PREDICATES = {
     'link': IS_LINK
 }
 
+// TODO: abstract into a utils module and add tests
 const get_author_count = (s: string) => {
     const authors = s.trim().split(/\s*(and|&|i)\s*/)
     let author_count = 0;
@@ -89,6 +90,7 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
             else
                 return str
         })
+        df.transform('authors', 'author_count', s => get_author_count(s).toString())
 
         return df.toPlainObjectArray().map(ParsedUrl.from)
 

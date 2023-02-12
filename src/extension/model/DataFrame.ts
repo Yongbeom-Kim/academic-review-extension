@@ -207,6 +207,7 @@ export class DataFrame<T> {
     /**
      * Reorder the columns target dataframe with the new headers provided.
      * New headers must be the same (except ordering) as the old headers
+     * Makes a copy (which is inefficient), but if it works it works. TODO
      * @param new_column_ordering array of headers to reorder by
      */
     reorderColumns(new_column_ordering: string[]): void {
