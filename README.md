@@ -16,8 +16,6 @@ On Chrome,
 If you're on other browsers, you should have some similar version of these steps.
 
 ## Notes
-### Known Issues:
-- For RBZ specifically, this only works for volume pages with format analogous to [Volume 63](https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-63/). A fix to accomodate flexible page structures is in progress. 
 
 ### Opening in Microsoft Excel
 - The .csv file that is emitted is in `UTF-8` formatting, and you will likely experience some form of text display issues.
