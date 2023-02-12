@@ -1,12 +1,10 @@
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
-import { instanceToPlain } from 'class-transformer';
 import browser, { tabs } from 'webextension-polyfill';
-import { ParsedUrl } from '../model/ParsedUrlObject';
 import ParserDriver from '../website_driver/BaseParserDriver';
 import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
 import styles from './Sidebar.module.css';
-import { objArrayToCsv } from '../libs/utils/obj_utils';
+import { DataFrame } from '../model/DataFrame';
 
 export default function Sidebar() {
     const [shown, setShown] = useState(false);
@@ -14,22 +12,30 @@ export default function Sidebar() {
 
     // Handling Form Input
     // @ts-ignore
-    const [siteLinkData, setSiteLinkData]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = useState([]);
+    const [siteLinkData, setSiteLinkData]: [DataFrame<string>, Dispatch<SetStateAction<DataFrame<string>>>] = useState(new DataFrame([],[[]]));
     // @ts-ignore
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
 
     const onFormSubmit = (e) => {
-        const submitData = siteLinkData.filter((x, i) => checked[i]);
-        console.log({ 'form_submit_data': submitData })
+        const submitData: DataFrame<string> = DataFrame.Empty(siteLinkData.headers)
+        checked.forEach((x, i) => {
+            if (x)
+                submitData.pushRow(siteLinkData.getRow(i));
+        })
+        // siteLinkData.filter((x, i) => checked[i]);
+        console.log({ 'form_submit_data': submitData.toPlainObjectArray() })
 
         // @ts-ignore some type problems here, this is the correct type
-        let submitDataPlainObj: Record<string, any>[] = instanceToPlain(submitData);
+        let submitDataPlainObj: Record<string, any>[] = submitData.toPlainObjectArray();
 
         localStorage.removeItem('data');
         localStorage.setItem("data", JSON.stringify(submitDataPlainObj));
 
-        let csvContent = objArrayToCsv(instanceToPlain(submitData))
-            
+        let csvContent = submitData.toCsvString();
+
+        console.log({csvContent});
+        console.log(encodeURIComponent(csvContent))
+        console.log("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent))
         
         window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
 
@@ -65,7 +71,7 @@ export default function Sidebar() {
 
 function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
 
-    const [siteLinkData, setSiteLinkData]: [ParsedUrl[], Dispatch<SetStateAction<ParsedUrl[]>>] = siteLinkDataHook
+    const [siteLinkData, setSiteLinkData]: [DataFrame<string>, Dispatch<SetStateAction<DataFrame<string>>>] = siteLinkDataHook
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = checkedStateHook
 
     const [allChecked, setAllChecked] = useState(false)
@@ -76,7 +82,7 @@ function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
     useEffect(() => {
         const parserList: ParserDriver[] = [new RafflesBulletinOfZoologyDriver(), new DefaultParserDriver()]
 
-        let parsedUrl: ParsedUrl[] = []
+        let parsedUrl: DataFrame<string>
         for (let i = 0; i < parserList.length; i++) {
             const parser = parserList[i];
             if (parser.is_url(document.URL)) {
@@ -84,8 +90,11 @@ function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
                 break;
             }
         }
-        setSiteLinkData(parsedUrl);
-        setChecked(parsedUrl.map(() => false))
+
+        parsedUrl!.transform('title', 'display_string', x => x);
+        
+        setSiteLinkData(parsedUrl!);
+        setChecked(Array(parsedUrl!.rows).fill(false))
     }, [])
 
     function toggleSelectedAll() {
@@ -99,7 +108,7 @@ function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
                 <legend>Select URLs</legend>
                 <button type='button' onClick={toggleSelectedAll}>{allChecked ? "Deselect All" : "Select All"}</button>
                 <div>
-                    {siteLinkData.map((value, i) => (
+                    {siteLinkData.toPlainObjectArray().map((value, i) => (
                         <>
                             <input
                                 checked={checked[i]}

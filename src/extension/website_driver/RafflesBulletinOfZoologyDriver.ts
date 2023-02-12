@@ -1,6 +1,7 @@
 import { ParsedUrl } from "../model/ParsedUrlObject";
 import ParserDriver from "./BaseParserDriver";
 import { DataFrame } from "../model/DataFrame";
+import { get_author_count } from "../libs/utils/academia_utils";
 
 // Array.from(document.querySelectorAll('div.publication-layout')).map(e => e.innerText.split(/\s*\n\s*/))
 
@@ -46,7 +47,7 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     // Example: https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-63/
     static URL_REGEX = new RegExp("lkcnhm\.nus\.edu\.sg\/publications\/raffles-bulletin-of-zoology\/volumes\/");
 
-    get_links(document: Document): ParsedUrl[] {
+    get_links(document: Document): DataFrame<string> {
         const volume_no = document.URL.split("/").filter(s => s !== '').at(-1)?.slice(7) ?? ""
         const elements = Array.from(document.querySelectorAll('div.publication-layout'));
         const texts = elements.map((e, i) => {
@@ -78,8 +79,9 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
                 return str
         })
         df.transform('authors', 'author_count', s => get_author_count(s).toString())
-
-        return df.toPlainObjectArray().map(ParsedUrl.from)
+        
+        console.log({df});
+        return df;
 
     }
 

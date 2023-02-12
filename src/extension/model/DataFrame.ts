@@ -26,6 +26,13 @@ export class DataFrame<T> {
     }
 
     /**
+     * Get an empty dataframe
+     * @param headers headers for empty dataframe
+     */
+    static Empty<T>(headers: string[]): DataFrame<T> {
+        return new DataFrame(headers, []);
+    }
+    /**
      * Create an "uneven" dataframe. Any data missing will be automatically filled in.
      * If there are insufficient headers, throws an error.
      * @param headers headers for the table
@@ -93,7 +100,7 @@ export class DataFrame<T> {
                     if (cell === DataFrame.EMPTY_CELL) {
                         return DataFrame.EMPTY_CSV_CELL;
                     } else {
-                        return '"' + `${cell}`.replaceAll('"', '""') + '"'
+                        return '"' + (`${cell}`.replaceAll('"', '""')) + '"'
                     }
                 }).join(',')
             ).join('\n')
@@ -270,5 +277,19 @@ export class DataFrame<T> {
             if (row.length != this.cols)
                 throw new Error("Inconsistent table width");
         })
+    }
+
+    getRow(i: number): (T | undefined)[] {
+        return this.data[i]
+    }
+
+    pushRow(row: (T | undefined)[]) {
+        if (row.length > this.cols)
+            throw new Error("Row is too long")
+        
+        while(row.length < this.cols)
+            row.push(DataFrame.EMPTY_CELL)
+        
+        this.data.push(row);
     }
 }
