@@ -7,8 +7,8 @@ import { categorizeStringTable } from "../libs/utils/obj_utils";
 
 const DOWNLOAD_PDF_HYPERLINK_TEXT = 'Download PDF'
 
-const PAGES_WITH_PP_REGEX = /Pp\. (\d+–\d+)/
-const PLAIN_PAGES_REGEX = /\d+–\d+/
+const PLAIN_PAGES_REGEX = /\d+(?:-|–)\d+/
+const PAGES_WITH_PP_REGEX = new RegExp(`Pp\\.\\s(${PLAIN_PAGES_REGEX.source})`)
 const EXCERPT_WITH_PAGES_REGEX = /([^\.]+)(?:\. )?(?:Pp\.|:) (\d+–\d+)/
 
 const IS_PAGES = (s: string) => PLAIN_PAGES_REGEX.test(s);
@@ -24,11 +24,11 @@ const IS_PUBLICATION_TYPE = (s: string) => {
         s.startsWith('Corrigendum')
 };
 const IS_AUTHOR = (s: string) => { // Authors are all in uppercase
-    return !(/[a-z]/.test(s))
+    return !IS_VOLUME_NUMBER(s) && !(/[a-z]/.test(s))
 }
 const IS_LINK = (s: string) => s.startsWith("https://")
 const IS_TITLE = (s: string) => !(IS_PAGES(s) || IS_PUBLICATION_TYPE(s) || IS_AUTHOR(s) || IS_LINK(s))
-const IS_VOLUME_NUMBER = (s: string) => /\d+(?:\(\d+\))?/.test(s)
+const IS_VOLUME_NUMBER = (s: string) => !s.startsWith("Pp.") && /\d+(?:\(\d+\))?/.test(s)
 
 
 export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
@@ -36,8 +36,8 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
     static URL_REGEX = new RegExp("lkcnhm\.nus\.edu\.sg\/publications\/raffles-bulletin-of-zoology\/volumes\/");
 
     get_links(document: Document): ParsedUrl[] {
-        const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
-
+        // const volume_no = document.querySelector('.title-page')?.textContent?.split(' ')?.slice(-1)[0] ?? "";
+        const volume_no = document.URL.split("/").filter(s => s !== '').at(-1)?.slice(7) ?? ""
         const elements = Array.from(document.querySelectorAll('div.publication-layout'));
         const texts = elements.map((e, i) => {
             const text_array: string[] = e.innerText.split(/\s*\n\s*/)
@@ -55,7 +55,8 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
             text_array.push(volume_no)
             text_array.push(link)
-
+            
+            console.log({text_array})
             return text_array;
         });
 
