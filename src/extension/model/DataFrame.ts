@@ -60,7 +60,7 @@ export class DataFrame<T> {
      * @param objects an array of plain objects to parse into a DataFrame.
      * @returns a DataFrame object.
      */
-    static FromPlainObjectArray<T>(objects: Record<string, T>[]): DataFrame<T> {
+    static FromPlainObjectArray<T>(objects: Record<string, T | undefined>[]): DataFrame<T> {
         const columns: string[] = []
         objects.forEach(object => {
             Object.keys(object).forEach(key => {
@@ -112,13 +112,12 @@ export class DataFrame<T> {
      * Get a JS Plain Object representation of the target dataframe
      * @returns a object
      */
-    toPlainObjectArray(): Record<string, T>[] {
-        const result: Record<string, T>[] = []
+    toPlainObjectArray(): Record<string, T|undefined>[] {
+        const result: Record<string, T|undefined>[] = []
         this.data.forEach(row => {
             result.push({})
             row.forEach((cell, i) => {
-                if (cell !== DataFrame.EMPTY_CELL)
-                    result.at(-1)![this.headers[i]] = cell;
+                result.at(-1)![this.headers[i]] = cell;
             })
         })
 
@@ -293,5 +292,23 @@ export class DataFrame<T> {
             row.push(DataFrame.EMPTY_CELL)
         
         this.data.push(row);
+    }
+
+    /**
+     * Test if 2 dataframes are equal.
+     * @param df dataframe to compare
+     * @returns a boolean on whetehr the dataframes are equal.
+     */
+    isEqual(df: DataFrame<T>) {
+        const df_copy = df.copy();
+        console.log(df_copy);
+        df_copy.reorderColumns(this.headers);
+        console.log("comparing")
+        console.log({this: this})
+        console.log({df_copy})
+        console.log(isEqual(this, df_copy))
+
+
+        return isEqual(this, df_copy)
     }
 }

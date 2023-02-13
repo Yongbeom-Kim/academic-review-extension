@@ -1,4 +1,3 @@
-import { ParsedUrl } from "../model/ParsedUrlObject";
 import ParserDriver from "./BaseParserDriver";
 import { DataFrame } from "../model/DataFrame";
 import { get_author_count } from "../libs/utils/academia_utils";
@@ -51,9 +50,10 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
         const volume_no = document.URL.split("/").filter(s => s !== '').at(-1)?.slice(7) ?? ""
         const elements = Array.from(document.querySelectorAll('div.publication-layout'));
         const texts = elements.map((e, i) => {
+            //@ts-ignore e.innrText exists, unlike what TS thinks
             const text_array: string[] = e.innerText.split(/\s*\n\s*/)
-                .map(s => s.trim())
-                .filter(s => s !== DOWNLOAD_PDF_HYPERLINK_TEXT);
+                .map((s: string) => s.trim())
+                .filter((s: string) => s !== DOWNLOAD_PDF_HYPERLINK_TEXT);
 
             // sometimes, text_array[2] is excerpt + pages
             if (EXCERPT_WITH_PAGES_REGEX.test(text_array[2])) {
