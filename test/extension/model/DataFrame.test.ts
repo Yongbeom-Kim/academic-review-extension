@@ -195,6 +195,7 @@ describe('test df.reorderColumns', () => {
 
 /**
  * Test for @method categorizeStringTable
+ * TODO: replace .isEqual() .toBeTruthy with a custom jest match function
  */
 describe('testing categorizeStringTable function', () => {
 
@@ -224,8 +225,6 @@ describe('testing categorizeStringTable function', () => {
         const table = [[2, 1, 0]]
         const preds = { '0': isZero, '1': isOne, '2': isTwo, '3': isThree }
         const expected = DataFrame.Uneven(['0', '1', '2', '3'], [[0, 1, 2]])
-        console.log(DataFrame.AutoHeaders(cols, table, preds))
-        console.log(expected)
         expect(DataFrame.AutoHeaders(cols, table, preds).isEqual(expected)).toBeTruthy();
     })
 
@@ -282,8 +281,6 @@ describe('testing df.equal', () => {
     test('test dataframe with rearranged, undefined rows', () => {
         const df1 = new DataFrame(['1', '2', '3'], [[1, 2, DataFrame.EMPTY_CELL]])
         const df2 = new DataFrame(['3', '1', '2'], [[DataFrame.EMPTY_CELL, 1, 2]])
-        console.log({ df1 })
-        console.log({ df2 })
         expect(df1.isEqual(df2)).toBeTruthy();
     })
 })

@@ -80,7 +80,7 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
         })
         df.transform('authors', 'author_count', s => get_author_count(s).toString())
         
-        console.log({df});
+        // console.log({df});
         return df;
 
     }

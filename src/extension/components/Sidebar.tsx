@@ -39,10 +39,6 @@ export default function Sidebar() {
 
         submitData.reorderColumns(ORDERING);
         let csvContent = submitData.toCsvString();
-
-        console.log({csvContent});
-        console.log(encodeURIComponent(csvContent))
-        console.log("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent))
         
         window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
 

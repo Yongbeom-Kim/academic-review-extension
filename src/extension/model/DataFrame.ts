@@ -217,8 +217,6 @@ export class DataFrame<T> {
      * @param new_column_ordering array of headers to reorder by
      */
     reorderColumns(new_column_ordering: string[]): void {
-        console.log(this.headers)
-        console.log(new_column_ordering)
         if (!isEqual(new_column_ordering.slice().sort(), this.headers.slice().sort()))
             throw new Error(`column ordering does not match table.`)
 
@@ -301,14 +299,8 @@ export class DataFrame<T> {
      */
     isEqual(df: DataFrame<T>) {
         const df_copy = df.copy();
-        console.log(df_copy);
         df_copy.reorderColumns(this.headers);
-        console.log("comparing")
-        console.log({this: this})
-        console.log({df_copy})
-        console.log(isEqual(this, df_copy))
-
-
+        
         return isEqual(this, df_copy)
     }
 }
