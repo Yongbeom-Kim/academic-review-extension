@@ -351,8 +351,6 @@ describe('testing df.selectRows', () => {
         const df = new DataFrame(['1','2','3'], [[1,2,3],[4,5,6],[7,8,9]])
         const rows = [false, true, false]
         const df_expected = new DataFrame(['1','2','3'], [[4,5,6]])
-        console.log(df.selectRows(rows))
-        console.log(df_expected)
         expect(df.selectRows(rows).isEqual(df_expected)).toBeTruthy()
     })
 })
