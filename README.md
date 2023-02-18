@@ -16,6 +16,8 @@ On Chrome,
 If you're on other browsers, you should have some similar version of these steps.
 
 ## Notes
+### Known Issues
+- Some journals have inconsistent formatting, and therefore all .csv files produced by this extensions have to be manually checked by hand. Example is [RBZ Volume 69](https://lkcnhm.nus.edu.sg/publications/raffles-bulletin-of-zoology/volumes/volume-69/), Corrigendum to Yasunaga T, Chérot F & Schwartz MD (2021).
 
 ### Opening in Microsoft Excel
 - The .csv file that is emitted is in `UTF-8` formatting, and you will likely experience some form of text display issues.
