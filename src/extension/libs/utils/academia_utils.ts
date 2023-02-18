@@ -30,10 +30,10 @@ export const get_cite_key = (title: string | undefined, authors: string | undefi
     authors = authors ?? '';
     year = year ?? '';
     let cite_key = "";
-    cite_key += (authors.split(/\s+/)[0].match(/\w*/) ?? '')[0].toLowerCase()
+    cite_key += (authors.split(/\s+/)[0]).toLowerCase()
 
-    // at most 5 non-fn words from title
-    const TITLE_LIMIT = 5;
+    // at most 4 non-fn words from title
+    const TITLE_LIMIT = 4;
     let i = 0;
     title.split(/\s+/).forEach(word => {
         if (FUNCTION_WORDS.includes(word.toLowerCase()))
@@ -48,7 +48,7 @@ export const get_cite_key = (title: string | undefined, authors: string | undefi
     if (year != '')
         cite_key += `(${year})`
     
-    return cite_key;
+    return cite_key.replaceAll(/\W/g, '');
 }
 
 export const METADATA = {

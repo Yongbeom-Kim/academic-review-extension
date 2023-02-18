@@ -6,7 +6,8 @@
     "permissions": [
         "tabs",
         "activeTab",
-        "scripting"
+        "scripting",
+        "downloads"
     ],
     "browser_action": {},
     "background": {

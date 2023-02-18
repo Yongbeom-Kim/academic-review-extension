@@ -11,6 +11,7 @@ import { DataFrame } from '../model/DataFrame';
 import styles from './Sidebar.module.css';
 import { DATA_ORDERING, METADATA } from '../libs/utils/academia_utils';
 import { download_pdf } from '../libs/utils/dom_utils';
+import { send_download_pdf_message } from '../libs/messages';
 
 
 
@@ -32,10 +33,12 @@ export default function Sidebar() {
 
         window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
         
-        const link_to_open = submitData.getCol(METADATA.Link)[1];
-        download_pdf(link_to_open, "1.pdf");
-        // Open extension window and 
-        // browser.runtime.sendMessage({message: PARSE_PDF_MESSAGE_NAME, url: submitData.getCol(METADATA.Link)[1]})
+        for (let i = 0; i < submitData.rows; i ++) {
+            const download_link = submitData.getCol(METADATA.Link)[i];
+            const download_file_name = submitData.getCol(METADATA.CiteKey)[i];
+            if (typeof download_link !== 'undefined' && typeof download_file_name !== 'undefined')
+                send_download_pdf_message(download_link, download_file_name);
+        }
 
     }
 

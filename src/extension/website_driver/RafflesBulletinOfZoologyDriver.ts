@@ -84,6 +84,8 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
         const df =
             DataFrame.AutoHeaders(DATA_CATEGORIES, texts, DATA_CATEGORY_PREDICATES)
         df.transform([METADATA.PageNumber], METADATA.PageNumber, str => { // Get rid of Pp. and P. in pages
+            if (typeof(str) === 'undefined')
+                return str
             if (PAGES_WITH_PP_REGEX.test(str))
                 return str.match(PAGES_WITH_PP_REGEX)![1]
             else
