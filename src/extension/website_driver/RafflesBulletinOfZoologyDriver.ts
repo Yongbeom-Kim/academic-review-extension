@@ -1,6 +1,7 @@
 import ParserDriver from "./BaseParserDriver";
 import { DataFrame } from "../model/DataFrame";
-import { get_author_count } from "../libs/utils/academia_utils";
+import { get_author_count, METADATA } from "../libs/utils/academia_utils";
+import { cloneDeep } from "lodash";
 
 // Array.from(document.querySelectorAll('div.publication-layout')).map(e => e.innerText.split(/\s*\n\s*/))
 
@@ -29,16 +30,15 @@ const IS_LINK = (s: string) => s.startsWith("https://")
 const IS_TITLE = (s: string) => !(IS_PAGES(s) || IS_PUBLICATION_TYPE(s) || IS_AUTHOR(s) || IS_LINK(s))
 const IS_VOLUME_NUMBER = (s: string) => !s.startsWith("Pp.") && /\d+(?:\(\d+\))?/.test(s)
 
-const DATA_CATEGORIES = ['volume_no', 'authors', 'title', 'publication_type', 'page_no', 'link'];
+const DATA_CATEGORIES = [METADATA.VolumeNumber, METADATA.Authors, METADATA.Title, METADATA.PublicationType, METADATA.PageNumber, METADATA.Link];
 
-const DATA_CATEGORY_PREDICATES = {
-    'volume_no': IS_VOLUME_NUMBER,
-    'authors': IS_AUTHOR,
-    'title': IS_TITLE,
-    'publication_type': IS_PUBLICATION_TYPE,
-    'page_no': IS_PAGES,
-    'link': IS_LINK
-}
+const DATA_CATEGORY_PREDICATES: Record<string, (s: string) => boolean> = {}
+DATA_CATEGORY_PREDICATES[METADATA.VolumeNumber] = IS_VOLUME_NUMBER;
+DATA_CATEGORY_PREDICATES[METADATA.Authors] = IS_AUTHOR;
+DATA_CATEGORY_PREDICATES[METADATA.Title] = IS_TITLE;
+DATA_CATEGORY_PREDICATES[METADATA.PublicationType] = IS_PUBLICATION_TYPE;
+DATA_CATEGORY_PREDICATES[METADATA.PageNumber] = IS_PAGES;
+DATA_CATEGORY_PREDICATES[METADATA.Link] = IS_LINK;
 
 
 
@@ -51,9 +51,21 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
         const elements = Array.from(document.querySelectorAll('div.publication-layout'));
         const texts = elements.map((e, i) => {
             //@ts-ignore e.innrText exists, unlike what TS thinks
-            const text_array: string[] = e.innerText.split(/\s*\n\s*/)
+            let text_array: string[] = e.innerText.split(/\s*\n\s*/)
                 .map((s: string) => s.trim())
                 .filter((s: string) => s !== DOWNLOAD_PDF_HYPERLINK_TEXT);
+            
+            console.log(text_array);
+
+            text_array = cloneDeep(text_array);
+            // So, the typical layout is:
+            // Author
+            // Title
+            // Excerpt
+            // IF there is something missing, it is probably the author.
+            // So, we add back the empty author.
+            if (text_array.length == 2)
+                text_array.unshift('');
 
             // sometimes, text_array[2] is excerpt + pages
             if (EXCERPT_WITH_PAGES_REGEX.test(text_array[2])) {
@@ -68,7 +80,7 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
             text_array.unshift(volume_no)
             text_array.unshift(link)
 
-            return text_array;
+            return cloneDeep(text_array);
         });
 
         const df =
@@ -81,7 +93,6 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
         })
         df.transform('authors', 'author_count', s => get_author_count(s).toString())
         
-        // console.log({df});
         return df;
 
     }

@@ -145,7 +145,7 @@ export class DataFrame<T> {
 
         permute(column_headers).forEach(column_headers => {
             const df = DataFrame.Uneven(column_headers, data);
-            const score = df.getMatchScore(column_header_predicates);
+            const score = df.getTableMatchScore(column_header_predicates);
             if (score > maxScore) {
                 best_match = df;
                 maxScore = score;
@@ -160,7 +160,7 @@ export class DataFrame<T> {
      * @param column_predicates 
      * @returns a float score between 0 and 1
      */
-    private getMatchScore(column_predicates: Record<string, ((arg0: T) => (boolean))>): number {
+    private getTableMatchScore(column_predicates: Record<string, ((arg0: T) => (boolean))>): number {
         let matches = 0
 
         for (let i = 0; i < this.rows; i++) {
@@ -175,6 +175,28 @@ export class DataFrame<T> {
         }
 
         return matches * 1.0 / this.rows / this.cols;
+    }
+
+    /**
+     * Get the fraction of columns that match a given predicate.
+     * Empty column cells will always be false.
+     * @param column_name name of column to test
+     * @param predicate predicate for matching
+     * @returns a number between 0 and 1.
+     */
+    getColumnMatchScore(column_name: string, predicate: (arg0: T) => boolean): number {
+        const index = this.headers.indexOf(column_name);
+        if (index === -1)
+            throw new Error("Column name not found in table")
+        
+        let matches = 0;
+        this.data.forEach((row) => {
+            const data = row[index];
+            if (typeof data !== 'undefined' && predicate(data))
+                matches ++;
+        })
+
+        return matches/this.rows;
     }
 
     /**

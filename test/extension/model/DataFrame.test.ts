@@ -309,32 +309,42 @@ describe('testing df.equal', () => {
 })
 
 /**
- * test for @method getMatchScore
+ * test for @method getTableMatchScore
  */
-describe('testing df.getMatchScore function', () => {
+describe('testing df.getTableMatchScore function', () => {
 
     test('perfect match, 1 row', () => {
         const df = new DataFrame(['0', '1', '2'], [[0, 1, 2]])
         const preds = {'0': isZero, '1': isOne, '2': isTwo}
-        expect(df['getMatchScore'](preds)).toBe(1)
+        expect(df['getTableMatchScore'](preds)).toBe(1)
     })
 
     test('imperfect match, 1 row', () => {
         const df = new DataFrame(['0', '1', '2'], [[0, 1, 1]])
         const preds = {'0': isZero, '1': isOne, '2': isTwo}
-        expect(df['getMatchScore'](preds)).toBeCloseTo(2 / 3, EPSILON)
+        expect(df['getTableMatchScore'](preds)).toBeCloseTo(2 / 3, EPSILON)
     })
     test('no match, 1 row', () => {
         const df = new DataFrame(['0', '1', '2'], [[1, 2, 3]])
         const preds = {'0': isZero, '1': isOne, '2': isTwo}
-        expect(df['getMatchScore'](preds)).toBe(0)
+        expect(df['getTableMatchScore'](preds)).toBe(0)
     })
     test('perfect match, 3 row', () => {
         const df = new DataFrame(['0', '1', '2'], [[0, 1, 2], [0, 1, 2], [0, 1,2]])
         const preds = {'0': isZero, '1': isOne, '2': isTwo}
-        expect(df['getMatchScore'](preds)).toBe(1)
+        expect(df['getTableMatchScore'](preds)).toBe(1)
     })
 
+})
+
+/**
+ * Test for @method getColumnMatchScore
+ */
+describe('testing df.getColumnMatchScore function', () => {
+    test('test df.getColumnMatchScore', () => {
+        const df = new DataFrame(['1','2','3'], [[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15]])
+        expect(df.getColumnMatchScore('2', isBetween0to10)).toBeCloseTo(3/5, EPSILON);
+    })
 })
 
 /**

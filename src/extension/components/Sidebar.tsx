@@ -5,8 +5,11 @@ import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
 import { DataFrame } from '../model/DataFrame';
 
+
+
 //@ts-ignore css modules have no types, unfortunately
 import styles from './Sidebar.module.css';
+import { DATA_ORDERING } from '../libs/utils/academia_utils';
 
 export default function Sidebar() {
     const [shown, setShown] = useState(false);
@@ -14,23 +17,22 @@ export default function Sidebar() {
 
     // Handling Form Input
     // @ts-ignore
-    const [siteLinkData, setSiteLinkData]: [DataFrame<string>, Dispatch<SetStateAction<DataFrame<string>>>] = useState(new DataFrame([],[[]]));
+    const [siteLinkData, setSiteLinkData]: [DataFrame<string>, Dispatch<SetStateAction<DataFrame<string>>>] = useState(new DataFrame([], [[]]));
     // @ts-ignore
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
 
     const onFormSubmit = (e) => {
         let submitData: DataFrame<string> = DataFrame.Empty(siteLinkData.headers)
         submitData = siteLinkData.selectRows(checked);
-        
-        localStorage.removeItem('data');
-        localStorage.setItem("data", JSON.stringify(submitData.toPlainObjectArray()));
-
-        const ORDERING = ['volume_no', 'year', 'authors', 'author_count', 'title',  'page_no', 'publication_type', 'keywords', 'countries', 'link', 'display_string'];
-
-        submitData.reorderColumns(ORDERING);
+        submitData.reorderColumns(DATA_ORDERING);
         let csvContent = submitData.toCsvString();
-        
+
+        // localStorage.removeItem('data');
+        // localStorage.setItem("data", JSON.stringify(submitData.toPlainObjectArray()));
+
         window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
+
+        
 
     }
 
@@ -85,7 +87,7 @@ function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
         }
 
         parsedUrl!.transform('title', 'display_string', x => x);
-        
+
         setSiteLinkData(parsedUrl!);
         setChecked(Array(parsedUrl!.rows).fill(false))
     }, [])
