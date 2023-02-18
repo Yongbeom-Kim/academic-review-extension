@@ -70,8 +70,8 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
             // sometimes, text_array[2] is excerpt + pages
             if (EXCERPT_WITH_PAGES_REGEX.test(text_array[2])) {
                 const matches = text_array[2].match(EXCERPT_WITH_PAGES_REGEX)!
-                text_array[2] = matches[1];
-                text_array.push(matches[2]);
+                text_array[2] = matches[2];
+                text_array.push(matches[1]);
             }
 
             const link = e.querySelector('a[href]')?.getAttribute('href') ?? ""
