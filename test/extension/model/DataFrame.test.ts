@@ -113,29 +113,28 @@ describe('test df.copy', () => {
 describe('test df.transform', () => {
     test('src column name not found throws error', () => {
         const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        expect(() => testDf.transform('4', '2', x => x + 1)).toThrow()
+        expect(() => testDf.transform(['4'], '2', x => (x ?? 0) + 1)).toThrow()
     })
     test('dst column name not found is added', () => {
         const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
         const expectedDf = new DataFrame(['1', '2', '3', '4'], [[1, 2, 3, 4], [4, 5, 6, 7]])
-        testDf.transform('3', '4', x => x + 1)
+        testDf.transform(['3'], '4', x => (x ?? 0) + 1)
         expect(testDf).toEqual(expectedDf)
     })
     test('erraneous function throws error', () => {
         const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        expect(() => testDf.transform('2', '2', x => { throw new Error() })).toThrow()
+        expect(() => testDf.transform(['2'], '2', x => { throw new Error() })).toThrow()
     })
     test('normal transform', () => {
         const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
         const expectedDf = new DataFrame(['1', '2', '3'], [[5, 2, 3], [8, 5, 6]])
-        testDf.transform('3', '1', x => x + 2)
+        testDf.transform(['3'], '1', x => (x ?? 0) + 2)
         expect(testDf).toEqual(expectedDf)
     })
-    test('handle empty cells', () => {
-        const testDf = DataFrame.Uneven(['1', '2', '3'], [[1, 2, 3], [4, 5]])
-        const expectedDf = DataFrame.Uneven(['1', '2', '3'], [[1, 2, 5], [4, 5]])
-        testDf.transform('3', '3', x => x + 2)
-        expect(testDf).toEqual(expectedDf)
+    test('handle multi-column map', () => {
+        const testDf = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
+        const expectedDf = new DataFrame(['1', '2', '3'], [[5, 2, 3], [11, 5, 6]])
+        testDf.transform(['3', '2'], '1', (a, b) => (a ?? 0) + (b ?? 0))
     })
 })
 
@@ -168,8 +167,8 @@ describe('test df.transform', () => {
  */
 describe('test df.popColumn', () => {
     test('test pop column', () => {
-        const df = new DataFrame(['1','2','3'], [[1,2,3],[4,5,6],[7,8,9]])
-        const expected_df = new DataFrame(['1','3'], [[1,3],[4,6],[7,9]])
+        const df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        const expected_df = new DataFrame(['1', '3'], [[1, 3], [4, 6], [7, 9]])
         df.popColumn('2');
         expect(df).toEqual(expected_df);
     })
@@ -302,8 +301,8 @@ describe('testing df.equal', () => {
     })
 
     test('test two empty dataframes', () => {
-        const df1 = DataFrame.Empty<number>(['1','2','3'])
-        const df2 = DataFrame.Empty<number>(['1','2','3'])
+        const df1 = DataFrame.Empty<number>(['1', '2', '3'])
+        const df2 = DataFrame.Empty<number>(['1', '2', '3'])
         expect(df1.isEqual(df2)).toBeTruthy();
     })
 })
@@ -315,23 +314,23 @@ describe('testing df.getTableMatchScore function', () => {
 
     test('perfect match, 1 row', () => {
         const df = new DataFrame(['0', '1', '2'], [[0, 1, 2]])
-        const preds = {'0': isZero, '1': isOne, '2': isTwo}
+        const preds = { '0': isZero, '1': isOne, '2': isTwo }
         expect(df['getTableMatchScore'](preds)).toBe(1)
     })
 
     test('imperfect match, 1 row', () => {
         const df = new DataFrame(['0', '1', '2'], [[0, 1, 1]])
-        const preds = {'0': isZero, '1': isOne, '2': isTwo}
+        const preds = { '0': isZero, '1': isOne, '2': isTwo }
         expect(df['getTableMatchScore'](preds)).toBeCloseTo(2 / 3, EPSILON)
     })
     test('no match, 1 row', () => {
         const df = new DataFrame(['0', '1', '2'], [[1, 2, 3]])
-        const preds = {'0': isZero, '1': isOne, '2': isTwo}
+        const preds = { '0': isZero, '1': isOne, '2': isTwo }
         expect(df['getTableMatchScore'](preds)).toBe(0)
     })
     test('perfect match, 3 row', () => {
-        const df = new DataFrame(['0', '1', '2'], [[0, 1, 2], [0, 1, 2], [0, 1,2]])
-        const preds = {'0': isZero, '1': isOne, '2': isTwo}
+        const df = new DataFrame(['0', '1', '2'], [[0, 1, 2], [0, 1, 2], [0, 1, 2]])
+        const preds = { '0': isZero, '1': isOne, '2': isTwo }
         expect(df['getTableMatchScore'](preds)).toBe(1)
     })
 
@@ -342,8 +341,8 @@ describe('testing df.getTableMatchScore function', () => {
  */
 describe('testing df.getColumnMatchScore function', () => {
     test('test df.getColumnMatchScore', () => {
-        const df = new DataFrame(['1','2','3'], [[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15]])
-        expect(df.getColumnMatchScore('2', isBetween0to10)).toBeCloseTo(3/5, EPSILON);
+        const df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12], [13, 14, 15]])
+        expect(df.getColumnMatchScore('2', isBetween0to10)).toBeCloseTo(3 / 5, EPSILON);
     })
 })
 
@@ -352,15 +351,15 @@ describe('testing df.getColumnMatchScore function', () => {
  */
 describe('testing df.selectRows', () => {
     test('select no rows', () => {
-        const df = new DataFrame(['1','2','3'], [[1,2,3],[1,2,3]])
+        const df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [1, 2, 3]])
         const rows = [false, false]
-        const df_expected = DataFrame.Empty<number>(['1','2','3'])
+        const df_expected = DataFrame.Empty<number>(['1', '2', '3'])
         expect(df.selectRows(rows).isEqual(df_expected)).toBeTruthy()
     })
     test('select some rows', () => {
-        const df = new DataFrame(['1','2','3'], [[1,2,3],[4,5,6],[7,8,9]])
+        const df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         const rows = [false, true, false]
-        const df_expected = new DataFrame(['1','2','3'], [[4,5,6]])
+        const df_expected = new DataFrame(['1', '2', '3'], [[4, 5, 6]])
         expect(df.selectRows(rows).isEqual(df_expected)).toBeTruthy()
     })
 })

@@ -11,7 +11,7 @@ const entryPoints = [
     {in: 'src/extension/background_script/detect_browser_actions.ts', out: 'background_script/detect_browser_actions'},
 
     // extension page
-    {in: 'src/extension_page/index.tsx', out: 'extension_page/index'}
+    {in: 'src/extension_page/pdf_parser/index.tsx', out: 'extension_page/pdf_parser/index'}
 ]
 
 const toCopy = [
@@ -19,8 +19,12 @@ const toCopy = [
     {in: 'static/', out: '/'},
 
     //extension page
-    {in: 'src/extension_page/index.html', out: 'extension_page/index.html'}
+    {in: 'src/extension_page/pdf_parser/index.html', out: 'extension_page/pdf_parser/index.html'}
 ]
+
+toCopy.forEach((x) => {
+    fs.cpSync(x.in, OUT_DIR+x.out, {recursive: true})
+})
 
 esbuild.build({
     entryPoints,
@@ -31,6 +35,3 @@ esbuild.build({
     plugins: [CssModulesPlugin()]
 })
 
-toCopy.forEach((x) => {
-    fs.cpSync(x.in, OUT_DIR+x.out, {recursive: true})
-})

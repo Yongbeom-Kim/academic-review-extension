@@ -1,5 +1,5 @@
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
-import browser, { tabs } from 'webextension-polyfill';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import browser from 'webextension-polyfill';
 import ParserDriver from '../website_driver/BaseParserDriver';
 import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
@@ -9,7 +9,10 @@ import { DataFrame } from '../model/DataFrame';
 
 //@ts-ignore css modules have no types, unfortunately
 import styles from './Sidebar.module.css';
-import { DATA_ORDERING } from '../libs/utils/academia_utils';
+import { DATA_ORDERING, METADATA } from '../libs/utils/academia_utils';
+import { download_pdf } from '../libs/utils/dom_utils';
+
+
 
 export default function Sidebar() {
     const [shown, setShown] = useState(false);
@@ -21,18 +24,18 @@ export default function Sidebar() {
     // @ts-ignore
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
 
-    const onFormSubmit = (e) => {
+    const onFormSubmit = () => {
         let submitData: DataFrame<string> = DataFrame.Empty(siteLinkData.headers)
         submitData = siteLinkData.selectRows(checked);
         submitData.reorderColumns(DATA_ORDERING);
         let csvContent = submitData.toCsvString();
 
-        // localStorage.removeItem('data');
-        // localStorage.setItem("data", JSON.stringify(submitData.toPlainObjectArray()));
-
         window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
-
         
+        const link_to_open = submitData.getCol(METADATA.Link)[1];
+        download_pdf(link_to_open, "1.pdf");
+        // Open extension window and 
+        // browser.runtime.sendMessage({message: PARSE_PDF_MESSAGE_NAME, url: submitData.getCol(METADATA.Link)[1]})
 
     }
 
@@ -86,7 +89,6 @@ function UrlSelectForm({ siteLinkDataHook, checkedStateHook, onSubmit }) {
             }
         }
 
-        parsedUrl!.transform('title', 'display_string', x => x);
 
         setSiteLinkData(parsedUrl!);
         setChecked(Array(parsedUrl!.rows).fill(false))

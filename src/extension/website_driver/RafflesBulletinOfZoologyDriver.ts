@@ -1,6 +1,6 @@
 import ParserDriver from "./BaseParserDriver";
 import { DataFrame } from "../model/DataFrame";
-import { get_author_count, METADATA } from "../libs/utils/academia_utils";
+import { get_author_count, get_cite_key, METADATA } from "../libs/utils/academia_utils";
 import { cloneDeep } from "lodash";
 
 // Array.from(document.querySelectorAll('div.publication-layout')).map(e => e.innerText.split(/\s*\n\s*/))
@@ -54,8 +54,6 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
             let text_array: string[] = e.innerText.split(/\s*\n\s*/)
                 .map((s: string) => s.trim())
                 .filter((s: string) => s !== DOWNLOAD_PDF_HYPERLINK_TEXT);
-            
-            console.log(text_array);
 
             text_array = cloneDeep(text_array);
             // So, the typical layout is:
@@ -85,13 +83,16 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
 
         const df =
             DataFrame.AutoHeaders(DATA_CATEGORIES, texts, DATA_CATEGORY_PREDICATES)
-        df.transform('page_no', 'page_no', str => { // Get rid of Pp. and P. in pages
+        df.transform([METADATA.PageNumber], METADATA.PageNumber, str => { // Get rid of Pp. and P. in pages
             if (PAGES_WITH_PP_REGEX.test(str))
                 return str.match(PAGES_WITH_PP_REGEX)![1]
             else
                 return str
         })
-        df.transform('authors', 'author_count', s => get_author_count(s).toString())
+
+        df.transform([METADATA.Title], METADATA.Display, x => x);
+        df.transform([METADATA.Authors], METADATA.AuthorCount, s => get_author_count(s ?? '').toString())
+        df.transform([METADATA.Title, METADATA.Authors, METADATA.VolumeNumber], METADATA.CiteKey, get_cite_key)
         
         return df;
 

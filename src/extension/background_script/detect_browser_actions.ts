@@ -1,4 +1,7 @@
 import browser from "webextension-polyfill";
+import { PARSE_PDF_MESSAGE_NAME, PDF_URL_QUERY_KEY } from "../libs/utils/config_utils";
+
+
 
 browser.browserAction.onClicked.addListener(t => {
     browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
@@ -9,12 +12,11 @@ browser.browserAction.onClicked.addListener(t => {
     })
 })
 
-browser.runtime.onMessage.addListener((request) => {
+browser.runtime.onMessage.addListener(async (request) => {
     // src/extension/components/Sidebar.tsx
-    if (request.message = 'start_review') {
-        browser.windows.create({
-            url: 'extension_page/index.html',
-            type: 'popup'
+    if (request.message = PARSE_PDF_MESSAGE_NAME) {
+        const tab = await browser.tabs.create({
+            url: `extension_page/pdf_parser/index.html?${PDF_URL_QUERY_KEY}=${request.url}`
         })
     }
 })

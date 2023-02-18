@@ -188,15 +188,15 @@ export class DataFrame<T> {
         const index = this.headers.indexOf(column_name);
         if (index === -1)
             throw new Error("Column name not found in table")
-        
+
         let matches = 0;
         this.data.forEach((row) => {
             const data = row[index];
             if (typeof data !== 'undefined' && predicate(data))
-                matches ++;
+                matches++;
         })
 
-        return matches/this.rows;
+        return matches / this.rows;
     }
 
     /**
@@ -210,14 +210,6 @@ export class DataFrame<T> {
         return cloneDeep(this);
     }
 
-    /**
-     * Applies a function onto one column of a dataframe
-     * @param column_name column to apply function onto
-     * @param map_fn function to apply
-     */
-    apply(column_name: string, fn: ((arg0: T) => T | undefined)): void {
-        this.transform(column_name, column_name, fn);
-    }
 
     /**
      * Append an empty column to the dataframe
@@ -300,25 +292,28 @@ export class DataFrame<T> {
      * Transform a column into another column of the dataframe.
      * Source column remains intact.
      * If destination column is not found in df, it is added.
-     * @param column_src Source column header to transform.
+     * Functions need to take into account any potential undefined values.
+     * @param src_columns Array of source column header to transform.
      * @param column_dst Destination column header to transform.
      * @param fn function to transform src to dst.
      */
-    transform(column_src: string, column_dst: string, fn: ((arg0: T) => (T | undefined))): void {
-        const src_index = this.headers.indexOf(column_src);
-        let dst_index = this.headers.indexOf(column_dst);
-        if (src_index == -1)
-            throw new Error("column name not in table")
+    transform(src_columns: string[], column_dst: string, fn: (...args: (T | undefined)[]) => (T | undefined)): void {
+        const src_indexes = src_columns.map(col => this.headers.indexOf(col));
 
+        src_indexes.forEach((index) => {
+            if (index == -1)
+                throw new Error("column name not in table")
+        })
+
+        let dst_index = this.headers.indexOf(column_dst);
         if (dst_index == -1) {
             this.pushEmptyColumn(column_dst)
             dst_index = this.headers.indexOf(column_dst);
         }
 
         this.data.forEach(row => {
-            const cell = row[src_index]
-            if (cell !== DataFrame.EMPTY_CELL)
-                row[dst_index] = fn(cell)
+            const args = src_indexes.map(i => row[i]);
+            row[dst_index] = fn.apply(null, args)
         })
     }
 
@@ -334,6 +329,14 @@ export class DataFrame<T> {
 
     getRow(i: number): (T | undefined)[] {
         return this.data[i]
+    }
+
+    getCol(col: string): (T | undefined)[] {
+        const index = this.headers.indexOf(col);
+        if (index === -1)
+            throw new Error("Column not found")
+
+        return this.data.map(row => row[index]);
     }
 
     pushRow(row: (T | undefined)[]) {
