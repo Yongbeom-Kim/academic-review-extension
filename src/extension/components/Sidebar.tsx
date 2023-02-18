@@ -19,24 +19,13 @@ export default function Sidebar() {
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
 
     const onFormSubmit = (e) => {
-        const submitData: DataFrame<string> = DataFrame.Empty(siteLinkData.headers)
-        checked.forEach((x, i) => {
-            if (x)
-                submitData.pushRow(siteLinkData.getRow(i));
-        })
-        console.log({ 'form_submit_data': submitData.toPlainObjectArray() })
-
-        // @ts-ignore some type problems here, this is the correct type
-        let submitDataPlainObj: Record<string, any>[] = submitData.toPlainObjectArray();
-
+        let submitData: DataFrame<string> = DataFrame.Empty(siteLinkData.headers)
+        submitData = siteLinkData.selectRows(checked);
+        
         localStorage.removeItem('data');
-        localStorage.setItem("data", JSON.stringify(submitDataPlainObj));
+        localStorage.setItem("data", JSON.stringify(submitData.toPlainObjectArray()));
 
         const ORDERING = ['volume_no', 'year', 'authors', 'author_count', 'title',  'page_no', 'publication_type', 'keywords', 'countries', 'link', 'display_string'];
-        ORDERING.forEach(col => {
-            if (!submitData.headers.includes(col))
-                submitData.pushEmptyColumn(col);    
-        })
 
         submitData.reorderColumns(ORDERING);
         let csvContent = submitData.toCsvString();

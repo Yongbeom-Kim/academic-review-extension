@@ -214,14 +214,43 @@ export class DataFrame<T> {
     }
 
     /**
+     * Pop a column in the dataframe by column name
+     * @param col column name to remove
+     */
+    popColumn(col: string): void {
+        if (!this.headers.includes(col))
+            throw new Error("Column does not exist")
+
+        const index = this.headers.indexOf(col);
+        this.headers.splice(index, 1);
+
+        this.data.forEach(row => {
+            row.splice(index, 1)
+        })
+
+        this.calculate_dimensions();
+    }
+
+    /**
      * Reorder the columns target dataframe with the new headers provided.
-     * New headers must be the same (except ordering) as the old headers
+     * If columns present are not in the new ordering, it is deleted.
+     * IF columns in ordering is not inside the current df, a corresponding empty column is added.
      * Makes a copy (which is inefficient), but if it works it works. TODO
      * @param new_column_ordering array of headers to reorder by
      */
     reorderColumns(new_column_ordering: string[]): void {
-        if (!isEqual(new_column_ordering.slice().sort(), this.headers.slice().sort()))
-            throw new Error(`column ordering does not match table.`)
+        // add columns
+        new_column_ordering.forEach((col) => {
+            if (!this.headers.includes(col))
+                this.pushEmptyColumn(col);
+        })
+
+        // remove columns
+        for (let i = 0; i < this.cols; i++)
+            if (!new_column_ordering.includes(this.headers[i])) {
+                this.popColumn(this.headers[i]);
+                i--;
+            }
 
         const mapping: Record<number, number> = {}
         for (let i = 0; i < this.cols; i++) {
@@ -304,7 +333,7 @@ export class DataFrame<T> {
     isEqual(df: DataFrame<T>) {
         const df_copy = df.copy();
         df_copy.reorderColumns(this.headers);
-        
+
         console.log(df_copy)
         console.log(this)
         return isEqual(this, df_copy)

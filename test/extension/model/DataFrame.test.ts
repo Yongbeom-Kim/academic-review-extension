@@ -164,23 +164,40 @@ describe('test df.transform', () => {
 })
 
 /**
+ * Test for @method popColumn
+ */
+describe('test df.popColumn', () => {
+    test('test pop column', () => {
+        const df = new DataFrame(['1','2','3'], [[1,2,3],[4,5,6],[7,8,9]])
+        const expected_df = new DataFrame(['1','3'], [[1,3],[4,6],[7,9]])
+        df.popColumn('2');
+        expect(df).toEqual(expected_df);
+    })
+})
+/**
  * Test for @method reorderColumns
  */
 describe('test df.reorderColumns', () => {
 
-    test('throw error on too few column names', () => {
+    test('reorder to fewer column names', () => {
         const test_df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        expect(() => test_df.reorderColumns(['1', '3'])).toThrow();
+        const expected_df = new DataFrame(['1', '3'], [[1, 3], [4, 6]])
+        test_df.reorderColumns(expected_df.headers);
+        expect(test_df).toEqual(expected_df);
     })
 
-    test('throw error on too many column names', () => {
+    test('reorder and increase columns names', () => {
         const test_df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        expect(() => test_df.reorderColumns(['1', '2', '3', '4'])).toThrow();
+        const expected_df = new DataFrame(['1', '2', '3', '4'], [[1, 2, 3, DataFrame.EMPTY_CELL], [4, 5, 6, DataFrame.EMPTY_CELL]])
+        test_df.reorderColumns(expected_df.headers);
+        expect(test_df).toEqual(expected_df);
     })
 
-    test('throw error on column name not found', () => {
+    test('Add column names not found', () => {
         const test_df = new DataFrame(['1', '2', '3'], [[1, 2, 3], [4, 5, 6]])
-        expect(() => test_df.reorderColumns(['1', '2', '4'])).toThrow();
+        const expected_df = new DataFrame(['1', '2', '4'], [[1, 2, DataFrame.EMPTY_CELL], [4, 5, DataFrame.EMPTY_CELL]])
+        test_df.reorderColumns(expected_df.headers);
+        expect(test_df).toEqual(expected_df);
     })
 
     test('proper rearrangement', () => {
