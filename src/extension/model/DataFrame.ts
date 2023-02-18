@@ -334,8 +334,6 @@ export class DataFrame<T> {
         const df_copy = df.copy();
         df_copy.reorderColumns(this.headers);
 
-        console.log(df_copy)
-        console.log(this)
         return isEqual(this, df_copy)
     }
 
