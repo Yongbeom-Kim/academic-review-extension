@@ -3,8 +3,10 @@ import browser, { tabs } from 'webextension-polyfill';
 import ParserDriver from '../website_driver/BaseParserDriver';
 import DefaultParserDriver from '../website_driver/DefaultParserDriver';
 import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZoologyDriver';
-import styles from './Sidebar.module.css';
 import { DataFrame } from '../model/DataFrame';
+
+//@ts-ignore css modules have no types, unfortunately
+import styles from './Sidebar.module.css';
 
 export default function Sidebar() {
     const [shown, setShown] = useState(false);
@@ -22,7 +24,6 @@ export default function Sidebar() {
             if (x)
                 submitData.pushRow(siteLinkData.getRow(i));
         })
-        // siteLinkData.filter((x, i) => checked[i]);
         console.log({ 'form_submit_data': submitData.toPlainObjectArray() })
 
         // @ts-ignore some type problems here, this is the correct type

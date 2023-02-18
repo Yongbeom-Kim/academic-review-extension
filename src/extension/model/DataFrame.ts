@@ -1,5 +1,5 @@
 import { permute } from '../libs/utils/obj_utils';
-import { isEqual } from "lodash";
+import { cloneDeep, isEqual } from "lodash";
 /**
  * A DataFrame class - an abstraction of a table of data with headers.
  */
@@ -112,8 +112,8 @@ export class DataFrame<T> {
      * Get a JS Plain Object representation of the target dataframe
      * @returns a object
      */
-    toPlainObjectArray(): Record<string, T|undefined>[] {
-        const result: Record<string, T|undefined>[] = []
+    toPlainObjectArray(): Record<string, T | undefined>[] {
+        const result: Record<string, T | undefined>[] = []
         this.data.forEach(row => {
             result.push({})
             row.forEach((cell, i) => {
@@ -182,7 +182,10 @@ export class DataFrame<T> {
      * @returns a copy of the dataframe
      */
     copy(): DataFrame<T> {
-        return DataFrame.FromPlainObjectArray(this.toPlainObjectArray());
+        // return new DataFrame(
+        //     JSON.parse(JSON.stringify(this.headers)),
+        //     JSON.parse(JSON.stringify(this.data)))
+        return cloneDeep(this);
     }
 
     /**
@@ -285,11 +288,12 @@ export class DataFrame<T> {
     pushRow(row: (T | undefined)[]) {
         if (row.length > this.cols)
             throw new Error("Row is too long")
-        
-        while(row.length < this.cols)
+
+        while (row.length < this.cols)
             row.push(DataFrame.EMPTY_CELL)
-        
+
         this.data.push(row);
+        this.calculate_dimensions();
     }
 
     /**
@@ -301,6 +305,17 @@ export class DataFrame<T> {
         const df_copy = df.copy();
         df_copy.reorderColumns(this.headers);
         
+        console.log(df_copy)
+        console.log(this)
         return isEqual(this, df_copy)
+    }
+
+    selectRows(selected: boolean[]): DataFrame<T> {
+        const new_df = DataFrame.Empty<T>(this.headers);
+
+        for (let i = 0; i < this.rows; i++)
+            if (selected[i])
+                new_df.pushRow(this.data[i]);
+        return new_df;
     }
 }

@@ -283,6 +283,12 @@ describe('testing df.equal', () => {
         const df2 = new DataFrame(['3', '1', '2'], [[DataFrame.EMPTY_CELL, 1, 2]])
         expect(df1.isEqual(df2)).toBeTruthy();
     })
+
+    test('test two empty dataframes', () => {
+        const df1 = DataFrame.Empty<number>(['1','2','3'])
+        const df2 = DataFrame.Empty<number>(['1','2','3'])
+        expect(df1.isEqual(df2)).toBeTruthy();
+    })
 })
 
 /**
@@ -312,4 +318,24 @@ describe('testing df.getMatchScore function', () => {
         expect(df['getMatchScore'](preds)).toBe(1)
     })
 
+})
+
+/**
+ * Tests for @method selectRows
+ */
+describe('testing df.selectRows', () => {
+    test('select no rows', () => {
+        const df = new DataFrame(['1','2','3'], [[1,2,3],[1,2,3]])
+        const rows = [false, false]
+        const df_expected = DataFrame.Empty<number>(['1','2','3'])
+        expect(df.selectRows(rows).isEqual(df_expected)).toBeTruthy()
+    })
+    test('select some rows', () => {
+        const df = new DataFrame(['1','2','3'], [[1,2,3],[4,5,6],[7,8,9]])
+        const rows = [false, true, false]
+        const df_expected = new DataFrame(['1','2','3'], [[4,5,6]])
+        console.log(df.selectRows(rows))
+        console.log(df_expected)
+        expect(df.selectRows(rows).isEqual(df_expected)).toBeTruthy()
+    })
 })
