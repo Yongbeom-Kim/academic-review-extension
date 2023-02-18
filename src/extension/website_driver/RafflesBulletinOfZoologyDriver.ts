@@ -63,9 +63,10 @@ export default class RafflesBulletinOfZoologyDriver implements ParserDriver {
             }
 
             const link = e.querySelector('a[href]')?.getAttribute('href') ?? ""
-
-            text_array.push(volume_no)
-            text_array.push(link)
+            
+            // Adding to the start of the array guarantees uniformity in these rows that are 'guaranteed'.
+            text_array.unshift(volume_no)
+            text_array.unshift(link)
 
             return text_array;
         });
