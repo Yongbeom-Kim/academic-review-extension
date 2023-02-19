@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import browser from 'webextension-polyfill';
 import { PDF_URL_QUERY_KEY } from "../../../extension/libs/utils/config_utils";
 
 export default function Page() {

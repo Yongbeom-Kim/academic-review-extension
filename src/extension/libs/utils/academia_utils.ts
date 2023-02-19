@@ -63,7 +63,8 @@ export const METADATA = {
     Countries: 'countries',
     Link: 'link',
     Display: 'display_string',
-    CiteKey: 'cite_key'
+    CiteKey: 'cite_key',
+    LocalPath: 'local_path'
 }
 
 export const DATA_ORDERING = [

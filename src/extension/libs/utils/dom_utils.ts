@@ -1,11 +1,7 @@
-import browser from "webextension-polyfill";
-
-
-export function download_pdf(url: string, filename: string) {
-    // const anchor = document.createElement('a');
-    // anchor.href = url;
-    // anchor.download = filename;
-    // anchor.click();
-    // browser.downloads.download({url, filename})
-    browser.runtime
+/**
+ * Download a csv string in the browser
+ * @param csv_string a valid CSV string.
+ */
+export function exportCSV(csv_string: string) {
+    window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csv_string));
 }

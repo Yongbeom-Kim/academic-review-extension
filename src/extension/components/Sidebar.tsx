@@ -10,7 +10,8 @@ import { DataFrame } from '../model/DataFrame';
 //@ts-ignore css modules have no types, unfortunately
 import styles from './Sidebar.module.css';
 import { DATA_ORDERING, METADATA } from '../libs/utils/academia_utils';
-import { send_download_pdfs_message } from '../libs/messages';
+import { send_download_pdfs_message, send_open_pdf_message } from '../libs/messages';
+import { exportCSV } from '../libs/utils/dom_utils';
 
 
 
@@ -24,13 +25,15 @@ export default function Sidebar() {
     // @ts-ignore
     const [checked, setChecked]: [boolean[], Dispatch<SetStateAction<boolean[]>>] = useState([])
 
-    const onFormSubmit = () => {
+    const onFormSubmit = async () => {
         let submitData: DataFrame<string> = DataFrame.Empty(siteLinkData.headers)
+
         submitData = siteLinkData.selectRows(checked);
         submitData.reorderColumns(DATA_ORDERING);
-        let csvContent = submitData.toCsvString();
-
-        window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
+        exportCSV(submitData.toCsvString());
+        
+        // let csvContent = submitData.toCsvString();
+        // window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
 
         const download_link = submitData.getCol(METADATA.Link)
         const download_file_name = submitData.getCol(METADATA.CiteKey)
@@ -42,7 +45,10 @@ export default function Sidebar() {
             }
         }
         // @ts-ignore we've filtered out the undefined's
-        send_download_pdfs_message(download_link, download_file_name).then((val) => console.log(`download finished! ${val}`));
+        const {ids, paths} = await send_download_pdfs_message(download_link, download_file_name);
+        console.log(paths);
+        
+        send_open_pdf_message(paths[0]);
 
     }
 
