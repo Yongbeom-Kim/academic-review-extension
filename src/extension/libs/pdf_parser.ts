@@ -3,8 +3,9 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 // @ts-ignore
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { PDFDocumentProxy, PDFPageProxy, TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
+import { findWordWithRadius } from "./utils/str_utils";
 
-if (process.env.JEST_WORKER_ID === undefined) {
+if (typeof process !== 'object' || process.env.JEST_WORKER_ID === undefined) { // process is not defined on the browser
     GlobalWorkerOptions.workerSrc = pdfjsWorker; // this throws an error in jest
 }
 
@@ -61,22 +62,31 @@ export async function getBody(pdf: PDFDocumentProxy): Promise<string> {
 
     const end = text.lastIndexOf('ACKNOWLEDGEMENTS')
 
-    console.log(text)
-    console.log(start)
-    console.log(end)
     return text.slice(start, end);
 }
 
 
+const DATE_REGEX = /date/i
+const PUBLICATION_DATE_SIGNPOST_REGEX = /date\s*of\s*publication|publication\s*date/i
+const YEAR_REGEX = /\d{4}/;
 /**
  * Get the body of a paper.
  * We attempt to do this with the TEXT CONTENTS of the pdf, not its metadata
  * @param pdf pdf to parse
  * @returns a promise to a number.
  */
-export async function getYear(pdf: PDFDocumentProxy): Promise<number> {
-    const text = getText(pdf);
-    return -1;
+export async function getYear(pdf: PDFDocumentProxy): Promise<number | undefined> {
+    const text = await getText(pdf);
+    const candidates = findWordWithRadius(DATE_REGEX, text, 8);
+    console.log({text});
+    console.log({candidates});
+    for (let i = 0; i < candidates.length; i ++) {
+        const candidate = candidates[i]
+        if (PUBLICATION_DATE_SIGNPOST_REGEX.test(candidate) && YEAR_REGEX.test(candidate)) {
+            return parseInt(candidate.match(YEAR_REGEX)![0]);
+        }
+    }
+
 }
 
 
@@ -120,9 +130,7 @@ export async function getText(pdf: PDFDocumentProxy): Promise<string> {
     for (let i = 1; i <= pdf.numPages; i++) {
         pages.push(await pdf.getPage(i))
     }
-    console.log({ pages })
     const page_texts = await Promise.all(
         pages.map(page => getTextInPage(page)))
-    console.log({ page_texts })
     return page_texts.join(' ');
 }

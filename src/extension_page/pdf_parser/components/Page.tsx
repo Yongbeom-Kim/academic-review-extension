@@ -2,7 +2,7 @@ import { TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { send_message_to_tab } from "../../../extension/libs/message_handler";
-import { getPdfProxy, getAbstract, getTextInPage, getKeywords, getBody } from "../../../extension/libs/pdf_parser";
+import { getPdfProxy, getAbstract, getTextInPage, getKeywords, getBody, getYear } from "../../../extension/libs/pdf_parser";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
 
 
