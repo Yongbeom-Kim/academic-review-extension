@@ -1,11 +1,14 @@
 import { type } from "os";
-import Browser from "webextension-polyfill";
-import { PDF_ID_QUERY_KEY } from "./utils/config_utils";
+import Browser, { Runtime } from "webextension-polyfill";
 import {
     BatchDownloadPDFRequest,
     BatchDownloadPDFResponse,
     BATCH_DOWNLOAD_REQUEST_MESSAGE,
-    BATCH_DOWNLOAD_RESPONSE_MSG
+    BATCH_DOWNLOAD_RESPONSE_MSG,
+    PARSED_PDF_RESPONSE_MSG,
+    ParsePDFRequest,
+    ParsePDFResponse as ParsedPDFResponse,
+    PARSE_PDF_REQUEST_MSG
 } from "./utils/messaging_types";
 
 export const PARSE_PDF_MESSAGE_NAME = 'parse_pdf'
@@ -115,28 +118,77 @@ export async function receive_download_pdf_message(received_request: BatchDownlo
 
 
 /**
- * Function to send a message to open a PDF tab.
+ * Function to send a message to parse a PDF in a new tab.
  * Called from content script to background script
  * @param pdf_url url to open
+ * @returns a promise of the resulting parse result.
  */
-export function send_open_pdf_message(pdf_url: string) {
-    Browser.runtime.sendMessage({ message: PARSE_PDF_MESSAGE_NAME, url: pdf_url })
+export function send_parse_pdf_message(pdf_url: string): Promise<ParsedPDFResponse> {
+    const request: ParsePDFRequest = { msg: PARSE_PDF_REQUEST_MSG, filePath: pdf_url }
+    Browser.runtime.sendMessage(request)
+
+    
+    // promise returned
+    let parsed_pdf_response_data: ParsedPDFResponse | undefined = undefined;
+    const response_promise: Promise<ParsedPDFResponse> = new Promise(resolve => {
+        const timer = setInterval(() => {
+            if (typeof parsed_pdf_response_data !== 'undefined')
+                resolve(parsed_pdf_response_data)
+        })
+    })
+
+    // listener to get data
+    const get_response = (message: ParsedPDFResponse) => {
+        if (message.msg === PARSED_PDF_RESPONSE_MSG && message.filePath === request.filePath) { // need extra check as there may be multiple messages concurrently
+            parsed_pdf_response_data = message;
+            Browser.runtime.onMessage.removeListener(get_response)
+        }
+    }
+    Browser.runtime.onMessage.addListener(get_response)
+
+    return response_promise;
 }
 
-// Just an identifier to be used
-let id = 0;
 /**
  * Function to receive message to open a pdf tab in a background script
  * @param request request
  */
-export async function receive_open_pdf_message(request: Record<string, string>) {
+export async function receive_open_pdf_message(request: ParsePDFRequest, sender: Runtime.MessageSender) {
     // from src/extension/components/Sidebar.tsx
-    if (request.message === PARSE_PDF_MESSAGE_NAME) {
-        const tab = await Browser.tabs.create({
-            url: `extension_page/pdf_parser/index.html?${PDF_URL_QUERY_KEY}=${request.url}&${PDF_ID_QUERY_KEY}=${id++}`
-        })
+    if (request.msg !== PARSE_PDF_MESSAGE_NAME)
+        return;
+    
+    const tab = await Browser.tabs.create({
+        url: `extension_page/pdf_parser/index.html`
+    })
 
-        console.log(Browser.extension.getViews().map(x => x.document));
+    // Send data to new tab on open
+    const onTabLoadCompletionListener = (tabId: number, changeInfo: Browser.Tabs.OnUpdatedChangeInfoType) => {
+        if (tabId != tab.id)
+            return;
+        if (!changeInfo.status || changeInfo.status !== 'complete')
+            return;
 
+        const message: ParsePDFRequest = { msg: PARSE_PDF_REQUEST_MSG, filePath: request.filePath, from_tab_id: sender.tab?.id }
+        Browser.tabs.sendMessage(tabId, message)
+        Browser.tabs.onUpdated.removeListener(onTabLoadCompletionListener);
     }
+
+    Browser.tabs.onUpdated.addListener(onTabLoadCompletionListener)
+
+}
+
+/**
+ * Function to send a message to a specific tab called from a content script.
+ * This function is handled by the @function handle_send_message_to_tab
+ * @param tabId tab id to send
+ * @param message message to send
+ */
+export function send_message_to_tab(tabId: number, message_data: Object) {
+    Browser.runtime.sendMessage({msg: 'send_msg_to_tab', tabId, message_data});
+}
+
+export function handle_send_message_to_tab({msg, tabId, message_data}: {msg: string, tabId: number, message_data: any}) {
+    if (msg === 'send_msg_to_tab')
+        Browser.tabs.sendMessage(tabId, message_data)
 }

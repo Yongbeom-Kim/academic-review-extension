@@ -6,13 +6,12 @@ import RafflesBulletinOfZoologyDriver from '../website_driver/RafflesBulletinOfZ
 import { DataFrame } from '../model/DataFrame';
 
 
-
 //@ts-ignore css modules have no types, unfortunately
 import styles from './Sidebar.module.css';
 import { DATA_ORDERING, METADATA } from '../libs/utils/academia_utils';
-import { send_download_pdfs_message, send_open_pdf_message } from '../libs/message_handler';
+import { send_download_pdfs_message, send_parse_pdf_message } from '../libs/message_handler';
 import { exportCSV } from '../libs/utils/dom_utils';
-
+import { getPdfProxy } from '../libs/pdf_parser';
 
 
 export default function Sidebar() {
@@ -59,7 +58,10 @@ export default function Sidebar() {
         
         console.log(submitData);
 
-        send_open_pdf_message(submitData.getCol(METADATA.LocalPath)[0])
+        // opens up a new extension tab to parse the pdf
+        // we are forced to open an extension page due to CORS policies on website.
+        send_parse_pdf_message(submitData.getCol(METADATA.LocalPath)[0]).then(x => console.log(x));
+        // getPdfProxy(submitData.getCol(METADATA.LocalPath)[0]).then(console.log)
 
     }
 

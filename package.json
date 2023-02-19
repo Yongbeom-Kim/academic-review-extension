@@ -14,6 +14,7 @@
     "loose-envify": "^1.4.0",
     "nanoid": "^3.3.4",
     "path-parse": "^1.0.7",
+    "pdfjs-dist": "^3.3.122",
     "picocolors": "^1.0.0",
     "postcss": "^8.4.21",
     "react": "^18.2.0",

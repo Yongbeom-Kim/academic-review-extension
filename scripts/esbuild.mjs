@@ -19,7 +19,10 @@ const toCopy = [
     {in: 'static/', out: '/'},
 
     //extension page
-    {in: 'src/extension_page/pdf_parser/index.html', out: 'extension_page/pdf_parser/index.html'}
+    {in: 'src/extension_page/pdf_parser/index.html', out: 'extension_page/pdf_parser/index.html'},
+
+    //pdfjs worker src
+    // {in: 'node_modules/pdfjs-dist/build/pdf.worker.js', out: 'bin/pdfjs/pdf.worker.js'}
 ]
 
 toCopy.forEach((x) => {
