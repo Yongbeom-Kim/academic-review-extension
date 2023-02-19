@@ -1,10 +1,13 @@
 import Browser from "webextension-polyfill";
 import { PDF_ID_QUERY_KEY } from "./utils/config_utils";
+import { BatchDownloadPDFRequest, BATCH_PDF_DOWNLOAD_MESSAGE } from "./utils/messaging_types";
 
-const PDF_DOWNLOAD_MESSAGE = 'download_pdf'
 const PDF_DOWNLOAD_DONE_MESSAGE = 'donwload_pdf_done'
 export const PARSE_PDF_MESSAGE_NAME = 'parse_pdf'
 export const PDF_URL_QUERY_KEY = 'pdf_url'
+
+// This module is a gathering of sending and receiving message requests.
+// Message from function send_X will always be received by function receive_X
 
 /**
  * Send a message from the content to background script to download a number of PDF files.
@@ -14,7 +17,8 @@ export const PDF_URL_QUERY_KEY = 'pdf_url'
  * @returns a promise of download ids that resolve only after the download has completed.
  */
 export function send_download_pdfs_message(urls: string[], filenames: string[]): Promise<{ ids: number[], paths: string[] }> {
-    Browser.runtime.sendMessage({ message: PDF_DOWNLOAD_MESSAGE, urls, filenames });
+    const request: BatchDownloadPDFRequest = { msg: BATCH_PDF_DOWNLOAD_MESSAGE, urls, filenames };
+    Browser.runtime.sendMessage(request);
 
     let download_ids: undefined | number[] = undefined;
     let download_paths: string[] = []
@@ -43,10 +47,13 @@ export function send_download_pdfs_message(urls: string[], filenames: string[]):
 }
 
 // msg received at background script (send completion to content script)
-export async function receive_downloaded_pdf_message({ message, urls, filenames }: { message: string, urls: string[], filenames: string[] }) {
+export async function receive_download_pdf_message(received_request: BatchDownloadPDFRequest) {
+    const { msg, urls, filenames } = received_request;
+
+    // Send messages to download all the other s
     const ids_to_download: number[] = [];
     const ids_downloaded: number[] = [];
-    if (message === PDF_DOWNLOAD_MESSAGE) {
+    if (msg === BATCH_PDF_DOWNLOAD_MESSAGE) {
         for (let i = 0; i < urls.length; i++) {
             const url = urls[i]
             let filename = filenames[i]
