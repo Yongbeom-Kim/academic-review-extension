@@ -3,7 +3,7 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 // @ts-ignore
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { PDFDocumentProxy, PDFPageProxy, TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
-import { findWordWithRadius } from "./utils/str_utils";
+import { findPhraseinTwoPasses, findWordWithRadius } from "./utils/str_utils";
 
 if (typeof process !== 'object' || process.env.JEST_WORKER_ID === undefined) { // process is not defined on the browser
     GlobalWorkerOptions.workerSrc = pdfjsWorker; // this throws an error in jest
@@ -72,17 +72,17 @@ const YEAR_REGEX = /\d{4}/;
 /**
  * Get the body of a paper.
  * We attempt to do this with the TEXT CONTENTS of the pdf, not its metadata
+ * We find things in this manner because it is more flexible but still somewhat robust.
  * @param pdf pdf to parse
  * @returns a promise to a number.
  */
 export async function getYear(pdf: PDFDocumentProxy): Promise<number | undefined> {
     const text = await getText(pdf);
-    const candidates = findWordWithRadius(DATE_REGEX, text, 8);
-    console.log({text});
-    console.log({candidates});
+
+    const candidates = findPhraseinTwoPasses(DATE_REGEX, PUBLICATION_DATE_SIGNPOST_REGEX, text, 8);
     for (let i = 0; i < candidates.length; i ++) {
         const candidate = candidates[i]
-        if (PUBLICATION_DATE_SIGNPOST_REGEX.test(candidate) && YEAR_REGEX.test(candidate)) {
+        if (YEAR_REGEX.test(candidate)) {
             return parseInt(candidate.match(YEAR_REGEX)![0]);
         }
     }

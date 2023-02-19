@@ -16,6 +16,12 @@ export default function Page() {
     const [keyword, setKeyword] = useState('');
     const [body, setBody] = useState('');
     const [year, setYear] = useState(-1);
+    // zrc_is_found radius 17
+    // deposit_is_found radius 17
+    // new record/ first record
+    // redescription/redescribe
+    // species/identification/taxonomic key
+    //checklist, inventor(y/ies)
 
     useEffect(() => {
         Browser.runtime.onMessage.addListener((message: ParsePDFRequest) => {

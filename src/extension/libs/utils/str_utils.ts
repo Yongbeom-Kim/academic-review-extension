@@ -55,3 +55,22 @@ export function findWordWithRadius(word: string | RegExp, text: string, radius: 
     return result;
 
 }
+
+/**
+ * This function helps you find a word in two passes.
+ * First looks for the @param first_word.
+ * Then, checks if @param second_phrase is present in the radius (of words) around the @param first_word
+ * Returns all snippets of such instances
+ * @param first_word first needle
+ * @param second_phrase second needle
+ * @param text text to search
+ * @param radius radius around word to search
+ */
+export function findPhraseinTwoPasses(first_word: string | RegExp, second_phrase: string | RegExp, text: string, radius: number): string[] {
+    const first_pass = findWordWithRadius(first_word, text, radius)
+    if (typeof second_phrase === 'string') {
+        return first_pass.filter(excerpt => excerpt.includes(second_phrase));
+    } else {
+        return first_pass.filter(excerpt => second_phrase.test(excerpt));
+    }
+}
