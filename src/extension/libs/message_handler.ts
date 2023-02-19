@@ -1,4 +1,5 @@
 import Browser from "webextension-polyfill";
+import { PDF_ID_QUERY_KEY } from "./utils/config_utils";
 
 const PDF_DOWNLOAD_MESSAGE = 'download_pdf'
 const PDF_DOWNLOAD_DONE_MESSAGE = 'donwload_pdf_done'
@@ -88,6 +89,9 @@ export async function receive_downloaded_pdf_message({ message, urls, filenames 
 export function send_open_pdf_message(pdf_url: string) {
     Browser.runtime.sendMessage({message: PARSE_PDF_MESSAGE_NAME, url: pdf_url})
 }
+
+// Just an identifier to be used
+let id = 0;
 /**
  * Function to receive message to open a pdf tab in a background script
  * @param request request
@@ -96,7 +100,10 @@ export async function receive_open_pdf_message(request: Record<string, string>) 
     // from src/extension/components/Sidebar.tsx
     if (request.message === PARSE_PDF_MESSAGE_NAME) {
         const tab = await Browser.tabs.create({
-            url: `extension_page/pdf_parser/index.html?${PDF_URL_QUERY_KEY}=${request.url}`
+            url: `extension_page/pdf_parser/index.html?${PDF_URL_QUERY_KEY}=${request.url}&${PDF_ID_QUERY_KEY}=${id++}`
         })
+
+        console.log(Browser.extension.getViews().map(x => x.document));
+        
     }
 }
