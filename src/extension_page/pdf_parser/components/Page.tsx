@@ -2,7 +2,7 @@ import { TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { send_message_to_tab } from "../../../extension/libs/message_handler";
-import { getPdfProxy, getAbstract, getTextInPage, getKeywords} from "../../../extension/libs/pdf_parser";
+import { getPdfProxy, getAbstract, getTextInPage, getKeywords, getText} from "../../../extension/libs/pdf_parser";
 import { getBody, getDepositLKCExcerpts, getYear } from "../../../extension/libs/utils/academia_utils";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
 import { get_array_string_representation } from "../../../extension/libs/utils/str_utils";
@@ -81,7 +81,7 @@ export default function Page() {
         // console.log(getTextInPage(await pdf.getPage(1)))
         // console.log("Abstract:")
         // console.log(getAbstract(pdf));
-        const body = await getBody(pdf);
+        const body = getBody(await getText(pdf));
         setBody(body);
         getAbstract(pdf).then(setAbstract)
         getKeywords(pdf).then(setKeyword)
