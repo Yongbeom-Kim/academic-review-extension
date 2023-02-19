@@ -7,12 +7,12 @@ export default function Page() {
     const [pdfLink, setPdfLink] = useState('');
 
     useEffect(() => {
-        browser.runtime.onMessage.addListener((message) => {
-            console.log(message);
-        })
-        browser.runtime.onMessageExternal.addListener((message) => {
-            console.log(message);
-        })
+        // browser.runtime.onMessage.addListener((message) => {
+        //     console.log(message);
+        // })
+        // browser.runtime.onMessageExternal.addListener((message) => {
+        //     console.log(message);
+        // })
 
         // We can assert since we are creating this page
         setPdfLink(new URLSearchParams(location.search).get(PDF_URL_QUERY_KEY)!);

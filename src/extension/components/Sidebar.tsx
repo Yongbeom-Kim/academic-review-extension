@@ -10,8 +10,7 @@ import { DataFrame } from '../model/DataFrame';
 //@ts-ignore css modules have no types, unfortunately
 import styles from './Sidebar.module.css';
 import { DATA_ORDERING, METADATA } from '../libs/utils/academia_utils';
-import { download_pdf } from '../libs/utils/dom_utils';
-import { send_download_pdf_message } from '../libs/messages';
+import { send_download_pdfs_message } from '../libs/messages';
 
 
 
@@ -32,13 +31,18 @@ export default function Sidebar() {
         let csvContent = submitData.toCsvString();
 
         window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
-        
-        for (let i = 0; i < submitData.rows; i ++) {
-            const download_link = submitData.getCol(METADATA.Link)[i];
-            const download_file_name = submitData.getCol(METADATA.CiteKey)[i];
-            if (typeof download_link !== 'undefined' && typeof download_file_name !== 'undefined')
-                send_download_pdf_message(download_link, download_file_name);
+
+        const download_link = submitData.getCol(METADATA.Link)
+        const download_file_name = submitData.getCol(METADATA.CiteKey)
+        for (let i = 0; i < download_link.length; i++) {
+            if (typeof download_link[i] === 'undefined' || typeof download_file_name[i] === 'undefined') {
+                download_link.splice(i, 1)
+                download_file_name.splice(i, 1)
+                i--
+            }
         }
+        // @ts-ignore we've filtered out the undefined's
+        send_download_pdfs_message(download_link, download_file_name).then((val) => console.log(`download finished! ${val}`));
 
     }
 
