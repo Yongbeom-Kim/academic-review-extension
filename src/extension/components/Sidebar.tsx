@@ -10,7 +10,7 @@ import { DataFrame } from '../model/DataFrame';
 //@ts-ignore css modules have no types, unfortunately
 import styles from './Sidebar.module.css';
 import { DATA_ORDERING, METADATA } from '../libs/utils/academia_utils';
-import { send_download_pdfs_message, send_open_pdf_message } from '../libs/messages';
+import { send_download_pdfs_message, send_open_pdf_message } from '../libs/message_handler';
 import { exportCSV } from '../libs/utils/dom_utils';
 
 
@@ -31,7 +31,7 @@ export default function Sidebar() {
         submitData = siteLinkData.selectRows(checked);
         submitData.reorderColumns(DATA_ORDERING);
         exportCSV(submitData.toCsvString());
-        
+
         // let csvContent = submitData.toCsvString();
         // window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvContent));
 
@@ -48,7 +48,18 @@ export default function Sidebar() {
         const {ids, paths} = await send_download_pdfs_message(download_link, download_file_name);
         console.log(paths);
         
-        send_open_pdf_message(paths[0]);
+        // add localpath to metadata
+        submitData.transform([METADATA.CiteKey], METADATA.LocalPath, (key) => {
+            if (typeof key === 'undefined')
+                return key
+            const local_path = paths.filter(path => path.includes(key))[0]
+            paths.slice(paths.indexOf(local_path));
+            return local_path;
+        })
+        
+        console.log(submitData);
+
+        send_open_pdf_message(submitData.getCol(METADATA.LocalPath)[0])
 
     }
 

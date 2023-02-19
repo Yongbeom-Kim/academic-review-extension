@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill";
-import { receive_downloaded_pdf_message, receive_open_pdf_message } from "../libs/messages";
+import { receive_downloaded_pdf_message, receive_open_pdf_message } from "../libs/message_handler";
 
 
 

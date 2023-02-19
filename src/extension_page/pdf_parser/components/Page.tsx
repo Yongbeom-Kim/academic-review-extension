@@ -21,9 +21,7 @@ export default function Page() {
     }, [])
 
     return (<>
-        <h1>Hello World!</h1>
-        <iframe src={pdfLink} frameBorder="0"></iframe>
-        {/* <div id='pdf_renderer'></div> */}
-        <object data={pdfLink} type="application/pdf"></object>
+        {/* <h1>Hello World!</h1> */}
+        <iframe src={pdfLink} frameBorder="0" style={{width: '100vw', height: '100vh'}}></iframe>
     </> )
 }    
