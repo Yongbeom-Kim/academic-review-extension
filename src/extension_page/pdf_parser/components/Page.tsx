@@ -2,8 +2,10 @@ import { TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { send_message_to_tab } from "../../../extension/libs/message_handler";
-import { getPdfProxy, getAbstract, getTextInPage, getKeywords, getBody, getYear } from "../../../extension/libs/pdf_parser";
+import { getPdfProxy, getAbstract, getTextInPage, getKeywords} from "../../../extension/libs/pdf_parser";
+import { getBody, getDepositLKCExcerpts, getYear } from "../../../extension/libs/utils/academia_utils";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
+import { get_array_string_representation } from "../../../extension/libs/utils/str_utils";
 
 
 export default function Page() {
@@ -16,6 +18,8 @@ export default function Page() {
     const [keyword, setKeyword] = useState('');
     const [body, setBody] = useState('');
     const [year, setYear] = useState(-1);
+    const [lkcExcerpts, setLkcExcerpts] = useState([''])
+
     // zrc_is_found radius 17
     // deposit_is_found radius 17
     // new record/ first record
@@ -63,7 +67,8 @@ export default function Page() {
             <b>Abstract: </b>{abstract} <br />
             <b>Keywords: </b>{keyword}<br />
             <b>Year: </b>{year}<br />
-            <b>Body: </b>{body}
+            <b>Body: </b>{body}<br />
+            <b>Are specimens deposited in LKCNHM/RMBR: </b>{`${lkcExcerpts.length > 0}: ${get_array_string_representation(lkcExcerpts)}`}
         </div>
 
     </>)
@@ -76,10 +81,11 @@ export default function Page() {
         // console.log(getTextInPage(await pdf.getPage(1)))
         // console.log("Abstract:")
         // console.log(getAbstract(pdf));
+        const body = await getBody(pdf);
+        setBody(body);
         getAbstract(pdf).then(setAbstract)
         getKeywords(pdf).then(setKeyword)
-        getBody(pdf).then(setBody)
-        getYear(pdf).then(setYear)
-        // console.log(pageText)
+        setYear(getYear(body));
+        setLkcExcerpts(getDepositLKCExcerpts(body));
     }
 }

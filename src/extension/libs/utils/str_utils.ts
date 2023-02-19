@@ -74,3 +74,7 @@ export function findPhraseinTwoPasses(first_word: string | RegExp, second_phrase
         return first_pass.filter(excerpt => second_phrase.test(excerpt));
     }
 }
+
+export function get_array_string_representation(array: any[]) {
+    return '[' + array.map(item => `${item}`).join(', ') + ']';
+}

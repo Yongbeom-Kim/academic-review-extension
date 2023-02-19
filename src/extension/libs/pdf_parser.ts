@@ -45,49 +45,9 @@ export async function getKeywords(pdf: PDFDocumentProxy): Promise<string> {
     return text_sliced_left.slice(0, keyword_end);
 }
 
-const INTRODUCTION_SECTION_HEADER_REGEX = /INTRO(?:DUCTIONS?)?/i
-
-/**
- * Get the body of a paper.
- * Returns everything from intro, everything before acknowledgements.
- * @param pdf 
- */
-export async function getBody(pdf: PDFDocumentProxy): Promise<string> {
-    const keywords = await getKeywords(pdf);
-    let text = await getText(pdf);
-
-    let start = text.search(INTRODUCTION_SECTION_HEADER_REGEX)
-    if (start === -1) //if not found, just 0
-        start = 0;
-
-    const end = text.lastIndexOf('ACKNOWLEDGEMENTS')
-
-    return text.slice(start, end);
-}
 
 
-const DATE_REGEX = /date/i
-const PUBLICATION_DATE_SIGNPOST_REGEX = /date\s*of\s*publication|publication\s*date/i
-const YEAR_REGEX = /\d{4}/;
-/**
- * Get the body of a paper.
- * We attempt to do this with the TEXT CONTENTS of the pdf, not its metadata
- * We find things in this manner because it is more flexible but still somewhat robust.
- * @param pdf pdf to parse
- * @returns a promise to a number.
- */
-export async function getYear(pdf: PDFDocumentProxy): Promise<number | undefined> {
-    const text = await getText(pdf);
 
-    const candidates = findPhraseinTwoPasses(DATE_REGEX, PUBLICATION_DATE_SIGNPOST_REGEX, text, 8);
-    for (let i = 0; i < candidates.length; i ++) {
-        const candidate = candidates[i]
-        if (YEAR_REGEX.test(candidate)) {
-            return parseInt(candidate.match(YEAR_REGEX)![0]);
-        }
-    }
-
-}
 
 
 /**

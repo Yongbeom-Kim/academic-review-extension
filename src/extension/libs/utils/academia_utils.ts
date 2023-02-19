@@ -1,4 +1,4 @@
-import { toTitleCase } from './str_utils';
+import { findPhraseinTwoPasses, findWordWithRadius, toTitleCase } from './str_utils';
 /**
  * Given a string of authors, fetch the author count
  * @param authors string of authors
@@ -81,3 +81,45 @@ export const DATA_ORDERING = [
     METADATA.Link,
     METADATA.Display
 ];
+
+
+const INTRODUCTION_SECTION_HEADER_REGEX = /INTRO(?:DUCTIONS?)?/i
+/**
+ * Get the body of a paper.
+ * Returns everything from intro, everything before acknowledgements.
+ * @param paper
+ */
+export function getBody(paper: string): string {
+    let start = paper.search(INTRODUCTION_SECTION_HEADER_REGEX)
+    if (start === -1) //if not found, just 0
+        start = 0;
+
+    const end = paper.lastIndexOf('ACKNOWLEDGEMENTS')
+
+    return paper.slice(start, end);
+}
+
+
+const DATE_REGEX = /date/i
+const PUBLICATION_DATE_SIGNPOST_REGEX = /date\s*of\s*publication|publication\s*date/i
+const YEAR_REGEX = /\d{4}/;
+/**
+ * Get the body of a paper.
+ * We attempt to do this with the TEXT CONTENTS of the pdf, not its metadata
+ * We find things in this manner because it is more flexible but still somewhat robust.
+ * @param pdf pdf to parse
+ * @returns a number.
+ */
+export function getYear(paper: string): (number | undefined) {
+    const candidates = findPhraseinTwoPasses(DATE_REGEX, PUBLICATION_DATE_SIGNPOST_REGEX, paper, 8);
+    for (let i = 0; i < candidates.length; i ++) {
+        const candidate = candidates[i]
+        if (YEAR_REGEX.test(candidate))
+            return parseInt(candidate.match(YEAR_REGEX)![0]);
+    }
+}
+
+const LKC_DEPOSIT_TEST_REGEX = /LKCNHM|RMBR|ZRC/i
+export function getDepositLKCExcerpts(paper: string): string[] {
+    return findWordWithRadius(LKC_DEPOSIT_TEST_REGEX, paper, 8);
+}
