@@ -2,7 +2,7 @@ import { TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { send_message_to_tab } from "../../../extension/libs/message_handler";
-import { getPdfProxy, getAbstract, getTextInPage, getKeywords } from "../../../extension/libs/pdf_parser";
+import { getPdfProxy, getAbstract, getTextInPage, getKeywords, getBody } from "../../../extension/libs/pdf_parser";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
 
 
@@ -14,6 +14,8 @@ export default function Page() {
     
     const [abstract, setAbstract] = useState('');
     const [keyword, setKeyword] = useState('');
+    const [body, setBody] = useState('');
+    const [year, setYear] = useState(-1);
 
     useEffect(() => {
         Browser.runtime.onMessage.addListener((message: ParsePDFRequest) => {
@@ -53,7 +55,9 @@ export default function Page() {
             <b>pdf file path: </b>{pdfFilePath} <br />
             <b>source tab id: </b>{sourceTabId} <br />
             <b>Abstract: </b>{abstract} <br />
-            <b>Keywords: </b>{keyword}
+            <b>Keywords: </b>{keyword}<br />
+            <b>Year: </b>{year}<br />
+            <b>Body: </b>{body}
         </div>
 
     </>)
@@ -68,6 +72,8 @@ export default function Page() {
         // console.log(getAbstract(pdf));
         getAbstract(pdf).then(setAbstract)
         getKeywords(pdf).then(setKeyword)
+        getBody(pdf).then(setBody)
+        getYear(pdf).then(setYear)
         // console.log(pageText)
     }
 }
