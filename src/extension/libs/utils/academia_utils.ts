@@ -84,39 +84,6 @@ export const DATA_ORDERING = [
     METADATA.Display
 ];
 
-
-/**
- * Get the body of a paper.
- * Returns everything from start, to everything before acknowledgements/citations.
- * If acknowledgements are not found, we try to find 
- * @param paper
- */
-export function getBody(paper: string): string {
-    const last_sections = ['ACKNOWLEDGEMENTS', 'LITERATURE CITED', 'CITATIONS']
-    const end = min(last_sections.map(section => paper.lastIndexOf(section)).filter(index => index !== -1))
-    return paper.slice(0, end);
-}
-
-
-const DATE_REGEX = /date/i
-const PUBLICATION_DATE_SIGNPOST_REGEX = /date\s*of\s*publication|publication\s*date/i
-const YEAR_REGEX = /\d{4}/;
-/**
- * Get the body of a paper.
- * We attempt to do this with the TEXT CONTENTS of the pdf, not its metadata
- * We find things in this manner because it is more flexible but still somewhat robust.
- * @param pdf pdf to parse
- * @returns a number.
- */
-export function getYear(paper: string): (number | undefined) {
-    const candidates = findPhraseinTwoPasses(DATE_REGEX, PUBLICATION_DATE_SIGNPOST_REGEX, paper, 8);
-    for (let i = 0; i < candidates.length; i++) {
-        const candidate = candidates[i]
-        if (YEAR_REGEX.test(candidate))
-            return parseInt(candidate.match(YEAR_REGEX)![0]);
-    }
-}
-
 const LKC_DEPOSIT_TEST_REGEX = /LKCNHM|RMBR|ZRC/i
 export function getDepositLKCExcerpts(paper: string): string[] {
     return findWordWithRadius(LKC_DEPOSIT_TEST_REGEX, paper, 8);

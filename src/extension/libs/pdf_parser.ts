@@ -3,6 +3,7 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 // @ts-ignore
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { PDFDocumentProxy, PDFPageProxy, TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
+import { findPhraseinTwoPasses } from "./utils/str_utils";
 
 if (typeof process !== 'object' || process.env.JEST_WORKER_ID === undefined) { // process is not defined on the browser
     GlobalWorkerOptions.workerSrc = pdfjsWorker; // this throws an error in jest
@@ -64,7 +65,23 @@ export class ParsedPdf {
         return this.getSection([0], KEYWORD_HEADER_REGEX, KEYWORD_MIN_WORDS)
     }
 
-    getBody(): string | undefined {
+    getYear(): number | undefined {
+        const DATE_REGEX = /date/i
+        const PUBLICATION_DATE_SIGNPOST_REGEX = /date\s?of\s?publication|publication\s?date/i
+        const YEAR_REGEX = /\d{4}/;
+        const text = this.getBody();
+        const candidates = findPhraseinTwoPasses(DATE_REGEX, PUBLICATION_DATE_SIGNPOST_REGEX, text, 8);
+        console.log(candidates);
+        for (let i = 0; i < candidates.length; i++) {
+            const candidate = candidates[i]
+            if (YEAR_REGEX.test(candidate))
+                return parseInt(candidate.match(YEAR_REGEX)![0]);
+        }
+
+        return undefined;
+    }
+
+    getBody(): string {
         // body is typically everything except the last page.
         const page_number_array: number[] = []
         for (let i = 0; i < this.paragraphs.length; i++)
@@ -84,6 +101,10 @@ export class ParsedPdf {
         page_number_array.pop();
         return this.getTextbyPages(page_number_array)
     }
+
+
+
+
     // getAuthorCountries
 
     /**
@@ -108,7 +129,6 @@ export class ParsedPdf {
         }
         return undefined;
     }
-
 
     /**
      * Parse a pdf into paragraphs, and get an array of paragraphs.
