@@ -14,6 +14,9 @@ const PARAGRAPH_Y_VAL_THRESHOLD = 12.5;
 const ABSTRACT_HEADER_REGEX = /^Abstract/i;
 const ABSTRACT_MIN_WORDS = 5;
 
+const KEYWORD_HEADER_REGEX = /Key\s*words?/i;
+const KEYWORD_MIN_WORDS = 5;
+
 export class ParsedPdf {
 
     paragraphs: string[][];
@@ -39,18 +42,27 @@ export class ParsedPdf {
     }
 
     getAbstract(): string | undefined {
-        return this.getSection(ABSTRACT_HEADER_REGEX, ABSTRACT_MIN_WORDS)
+        return this.getSection([0], ABSTRACT_HEADER_REGEX, ABSTRACT_MIN_WORDS)
     }
+
+    getKeyWords(): string | undefined {
+        return this.getSection([0], KEYWORD_HEADER_REGEX, KEYWORD_MIN_WORDS)
+    }
+    // getAuthorCountries
+    // getBody
 
     /**
      * Get a section by the section header regex, as well as the minimum number of words in the section.
+     * @param page_numbers page numbers to search
      * @param section_header_regex regex for section header
      * @param min_words_in_section minimum amount of words in section
      * @returns a string (or undefined if not found)
      */
-    getSection(section_header_regex: RegExp, min_words_in_section: number): string | undefined {
-        for (let i = 0; i < this.paragraphs[0].length; i ++) {
-            const paragraph = this.paragraphs[0][i];
+    getSection(page_numbers: number[], section_header_regex: RegExp, min_words_in_section: number): string | undefined {
+        const pages = page_numbers.flatMap(page_no => this.paragraphs[page_no]);
+
+        for (let i = 0; i < pages.length; i ++) {
+            const paragraph = pages[i];
             if (section_header_regex.test(paragraph)) {
                 if (paragraph.split(/\s+/).length < min_words_in_section) {
                     return paragraph + ' ' + this.paragraphs[i+1]
@@ -61,9 +73,6 @@ export class ParsedPdf {
         }
         return undefined;
     }
-    // getKeyWords
-    // getAuthorCountries
-    // getBody
 
 
     /**
@@ -125,7 +134,7 @@ export async function getPdfProxy(url: string): Promise<PDFDocumentProxy> {
     return getDocument(url).promise;
 }
 
-const KEYWORD_HEADER_REGEX = /Key\s*words\./i
+// const KEYWORD_HEADER_REGEX = /Key\s*words\./i
 const KEYWORD_END_REGEX = /RAFFLES|INTRODUCTION/i
 
 export async function getKeywords(pdf: PDFDocumentProxy): Promise<string> {

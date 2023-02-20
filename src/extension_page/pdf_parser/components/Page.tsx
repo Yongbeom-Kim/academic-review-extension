@@ -2,7 +2,7 @@ import { TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { send_message_to_tab } from "../../../extension/libs/message_handler";
-import { getPdfProxy, getAbstract, getTextInPage, getKeywords, getText, ParsedPdf } from "../../../extension/libs/pdf_parser";
+import { getPdfProxy, getTextInPage, getText, ParsedPdf } from "../../../extension/libs/pdf_parser";
 import { getAllCountriesFrom, getAuthorCountries, getBody, getDepositLKCExcerpts, getYear } from "../../../extension/libs/utils/academia_utils";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
 import { get_array_string_representation } from "../../../extension/libs/utils/str_utils";
@@ -33,8 +33,8 @@ export default function Page() {
             if (message.msg !== PARSE_PDF_REQUEST_MSG)
                 return;
 
-            console.log("got message:")
-            console.log({ message })
+            // console.log("got message:")
+            // console.log({ message })
             setPdfFilePath(message.filePath);
             setSourceTabId(message.from_tab_id ?? -1);
 
@@ -65,8 +65,8 @@ export default function Page() {
         <div className="identifier">
             <b>pdf file path: </b>{pdfFilePath} <br />
             <b>Abstract: </b>{abstract} <br />
-            {/* <b>source tab id: </b>{sourceTabId} <br />
             <b>Keywords: </b>{keyword}<br />
+            {/* <b>source tab id: </b>{sourceTabId} <br />
             <b>Year: </b>{year}<br />
             <b>Author Countries: </b>{authorCountries.join(', ')}<br />
             <b>Are specimens deposited in LKCNHM/RMBR: </b>{`${lkcExcerpts.length > 0}: ${lkcExcerpts[0]}`}<br />
@@ -78,19 +78,11 @@ export default function Page() {
     async function getPdfInfo(filePath: string) {
         const pdf = await getPdfProxy(filePath);
         const parsedPdf = await ParsedPdf.getParagraphsByPage(pdf);
-        // getParagraphsByPage(pdf);
-        // console.log("PDF:")
-        // console.log(pdf)
-        // console.log("First page:")
-        // console.log(getTextInPage(await pdf.getPage(1)))
-        // console.log("Abstract:")
-        // console.log(getAbstract(pdf));
-        // const body = getBody(await getText(pdf));
-        // setBody(body);
         const abstract = parsedPdf.getAbstract() ?? 'undefined'
-        console.log({abstract})
         setAbstract(abstract);
-        // getKeywords(pdf).then(setKeyword)
+
+        const keywords = parsedPdf.getKeyWords() ?? 'undefined'
+        setKeyword(keywords);
         // setYear(getYear(body));
         // setLkcExcerpts(getDepositLKCExcerpts(body));
         // setAuthorCountries(getAuthorCountries(body));
