@@ -16,6 +16,8 @@ export default function Page() {
 
     const [abstract, setAbstract] = useState('');
     const [keyword, setKeyword] = useState('');
+    const [pages, setPages] = useState(0);
+
     const [body, setBody] = useState('');
     const [year, setYear] = useState(-1);
     const [lkcExcerpts, setLkcExcerpts] = useState([''])
@@ -43,14 +45,11 @@ export default function Page() {
     }, [])
 
     useEffect(() => {
-
-        console.log("Sending Message");
         const return_message: ParsePDFResponse = {
             msg: PARSED_PDF_RESPONSE_MSG,
             filePath: pdfFilePath,
             data: "hello"
         }
-        console.log({ return_message })
         send_message_to_tab(sourceTabId, return_message);
     }, [sourceTabId])
 
@@ -66,11 +65,13 @@ export default function Page() {
             <b>pdf file path: </b>{pdfFilePath} <br />
             <b>Abstract: </b>{abstract} <br />
             <b>Keywords: </b>{keyword}<br />
+            <b>Pages: </b>{pages}<br />
+            <b>Body: </b>{body} <br />
             {/* <b>source tab id: </b>{sourceTabId} <br />
             <b>Year: </b>{year}<br />
             <b>Author Countries: </b>{authorCountries.join(', ')}<br />
             <b>Are specimens deposited in LKCNHM/RMBR: </b>{`${lkcExcerpts.length > 0}: ${lkcExcerpts[0]}`}<br />
-            <b>Body: </b>{body} */}
+            */}
         </div>
 
     </>)
@@ -78,11 +79,12 @@ export default function Page() {
     async function getPdfInfo(filePath: string) {
         const pdf = await getPdfProxy(filePath);
         const parsedPdf = await ParsedPdf.getParagraphsByPage(pdf);
-        const abstract = parsedPdf.getAbstract() ?? 'undefined'
-        setAbstract(abstract);
 
-        const keywords = parsedPdf.getKeyWords() ?? 'undefined'
-        setKeyword(keywords);
+        setAbstract(parsedPdf.getAbstract() ?? 'undefined')
+        setKeyword(parsedPdf.getKeyWords() ?? 'undefined')
+        setPages(parsedPdf.paragraphs.length)
+        setBody(parsedPdf.getBody() ?? 'undefined')
+        // const pages 
         // setYear(getYear(body));
         // setLkcExcerpts(getDepositLKCExcerpts(body));
         // setAuthorCountries(getAuthorCountries(body));

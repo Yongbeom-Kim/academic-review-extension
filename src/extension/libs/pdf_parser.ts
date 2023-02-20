@@ -14,8 +14,11 @@ const PARAGRAPH_Y_VAL_THRESHOLD = 12.5;
 const ABSTRACT_HEADER_REGEX = /^Abstract/i;
 const ABSTRACT_MIN_WORDS = 5;
 
-const KEYWORD_HEADER_REGEX = /Key\s*words?/i;
+const KEYWORD_HEADER_REGEX = /^Key\s*words?/i;
 const KEYWORD_MIN_WORDS = 5;
+
+const ACKNOWLEDGEMENTS_SECTION_HEADER_REGEX = /^ACKNOWLEDGEMENTS?/i;
+const BIBLIOGRAPHY_SECTION_HEADER_REGEX = /^(?:LITERATURE CITED|CITATIONS?|REFERENCES?|BIBLIOGRAPHY)/i;
 
 export class ParsedPdf {
 
@@ -27,11 +30,11 @@ export class ParsedPdf {
 
     /**
      * Get the contents of a page by page number
-     * @param page_no page number to get the content of (0-index)
+     * @param page_numbers an array of page numbers to get the content of (0-index)
      * @returns content of a page
      */
-    getPageText(page_no: number): string {
-        return this.paragraphs[page_no].join('\n')
+    getTextbyPages(page_numbers: number[]): string {
+        return page_numbers.flatMap(num => this.paragraphs[num]).join('\n')
     }
 
     /**
@@ -48,6 +51,27 @@ export class ParsedPdf {
     getKeyWords(): string | undefined {
         return this.getSection([0], KEYWORD_HEADER_REGEX, KEYWORD_MIN_WORDS)
     }
+
+    getBody(): string | undefined {
+        // body is typically everything except the last page.
+        const page_number_array: number[] = []
+        for (let i = 0; i < this.paragraphs.length; i++)
+            page_number_array.push(i)
+
+        const acknowlegement_section_header = this.getSection(page_number_array, ACKNOWLEDGEMENTS_SECTION_HEADER_REGEX, 0);
+        const bibliography_section_header = this.getSection(page_number_array, BIBLIOGRAPHY_SECTION_HEADER_REGEX, 0);
+        const full_text = this.getFullText()
+
+        if (typeof acknowlegement_section_header !== 'undefined')
+            return full_text.slice(0, full_text.lastIndexOf(acknowlegement_section_header));
+
+        if (typeof bibliography_section_header !== 'undefined')
+            return full_text.slice(0, full_text.lastIndexOf(bibliography_section_header));
+
+        // if we cannot find acknowledgements or bibliography, just remove the last page
+        page_number_array.pop();
+        return this.getTextbyPages(page_number_array)
+    }
     // getAuthorCountries
     // getBody
 
@@ -61,11 +85,11 @@ export class ParsedPdf {
     getSection(page_numbers: number[], section_header_regex: RegExp, min_words_in_section: number): string | undefined {
         const pages = page_numbers.flatMap(page_no => this.paragraphs[page_no]);
 
-        for (let i = 0; i < pages.length; i ++) {
+        for (let i = 0; i < pages.length; i++) {
             const paragraph = pages[i];
             if (section_header_regex.test(paragraph)) {
                 if (paragraph.split(/\s+/).length < min_words_in_section) {
-                    return paragraph + ' ' + this.paragraphs[i+1]
+                    return paragraph + ' ' + this.paragraphs[i + 1]
                 } else {
                     return paragraph
                 }
@@ -86,8 +110,8 @@ export class ParsedPdf {
         // load text items
         for (let i = 1; i <= pdf.numPages; i++) {
             text_items_by_page.push([]);
-            const textItems = (await(await pdf.getPage(i)).getTextContent()).items;
-            const styleItems = (await(await pdf.getPage(i)).getTextContent()).styles;
+            const textItems = (await (await pdf.getPage(i)).getTextContent()).items;
+            const styleItems = (await (await pdf.getPage(i)).getTextContent()).styles;
 
             textItems.forEach(item => {
                 if ('str' in item && item.str.trim().length !== 0)
