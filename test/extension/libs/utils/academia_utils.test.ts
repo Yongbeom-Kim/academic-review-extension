@@ -1,4 +1,4 @@
-import { get_author_count } from "../../../../src/extension/libs/utils/academia_utils";
+import { get_author_count, getAllCountriesFrom } from "../../../../src/extension/libs/utils/academia_utils";
 
 /**
  * Test for @method get_author_count
@@ -45,4 +45,13 @@ describe('test get_author_count', () => {
         expect(get_author_count(authors)).toBe(expected_count);
     })
 
+})
+
+/**
+ * Test for @method getAllCountriesFrom
+ */
+describe('test getAllCountriesFrom', () => {
+    test('get a number of countries', () => {
+        expect(getAllCountriesFrom('China absohe china china')).toEqual(['China','China','China'])
+    })
 })

@@ -1,3 +1,5 @@
+import { countries } from 'countries-list';
+import { min } from 'lodash';
 import { findPhraseinTwoPasses, findWordWithRadius, toTitleCase } from './str_utils';
 /**
  * Given a string of authors, fetch the author count
@@ -40,14 +42,14 @@ export const get_cite_key = (title: string | undefined, authors: string | undefi
             return;
         if (i < TITLE_LIMIT) {
             cite_key += toTitleCase(word)
-            i ++;
+            i++;
         }
     })
 
     // add year
     if (year != '')
         cite_key += `(${year})`
-    
+
     return cite_key.replaceAll(/\W/g, '');
 }
 
@@ -83,20 +85,16 @@ export const DATA_ORDERING = [
 ];
 
 
-const INTRODUCTION_SECTION_HEADER_REGEX = /INTRO(?:DUCTIONS?)?/i
 /**
  * Get the body of a paper.
- * Returns everything from intro, everything before acknowledgements.
+ * Returns everything from start, to everything before acknowledgements/citations.
+ * If acknowledgements are not found, we try to find 
  * @param paper
  */
 export function getBody(paper: string): string {
-    let start = paper.search(INTRODUCTION_SECTION_HEADER_REGEX)
-    if (start === -1) //if not found, just 0
-        start = 0;
-
-    const end = paper.lastIndexOf('ACKNOWLEDGEMENTS')
-
-    return paper.slice(start, end);
+    const last_sections = ['ACKNOWLEDGEMENTS', 'LITERATURE CITED', 'CITATIONS']
+    const end = min(last_sections.map(section => paper.lastIndexOf(section)).filter(index => index !== -1))
+    return paper.slice(0, end);
 }
 
 
@@ -112,7 +110,7 @@ const YEAR_REGEX = /\d{4}/;
  */
 export function getYear(paper: string): (number | undefined) {
     const candidates = findPhraseinTwoPasses(DATE_REGEX, PUBLICATION_DATE_SIGNPOST_REGEX, paper, 8);
-    for (let i = 0; i < candidates.length; i ++) {
+    for (let i = 0; i < candidates.length; i++) {
         const candidate = candidates[i]
         if (YEAR_REGEX.test(candidate))
             return parseInt(candidate.match(YEAR_REGEX)![0]);
@@ -122,4 +120,40 @@ export function getYear(paper: string): (number | undefined) {
 const LKC_DEPOSIT_TEST_REGEX = /LKCNHM|RMBR|ZRC/i
 export function getDepositLKCExcerpts(paper: string): string[] {
     return findWordWithRadius(LKC_DEPOSIT_TEST_REGEX, paper, 8);
+}
+
+
+const INTRODUCTION_SECTION_HEAD_REGEX = /INTRODUCTION/;
+const AUTHOR_INFO_REGEX = /accepted by:/i;
+export function getAuthorCountries(paper: string) {
+
+    const intro_index = paper.search(INTRODUCTION_SECTION_HEAD_REGEX)
+    const author_info_index = paper.search(AUTHOR_INFO_REGEX)
+    console.log(paper.slice(author_info_index, intro_index))
+
+    return getAllCountriesFrom(paper.slice(author_info_index, intro_index));
+}
+
+
+
+
+//@ts-ignore
+const COUNTRY_NAMES = Object.keys(countries).map(code => countries[code].name);
+const COUNTRY_NAMES_LOWERCASE = COUNTRY_NAMES.map(x => x.toLowerCase())
+
+/**
+ * Method to extract all countries (in order) from a text.
+ * @param text text to extract country from
+ * @returns the countries extracted.
+ */
+export function getAllCountriesFrom(text: string): string[] {
+    const countries_scraped: string[] = [];
+    text.split(/\s+/).forEach(word => {
+        if (COUNTRY_NAMES_LOWERCASE.includes(word.toLowerCase())) {
+            const index = COUNTRY_NAMES_LOWERCASE.indexOf(word.toLowerCase());
+            countries_scraped.push(COUNTRY_NAMES[index]);
+        }
+    })
+
+    return countries_scraped;
 }
