@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { send_message_to_tab } from "../../../extension/libs/message_handler";
 import { getPdfProxy, ParsedPdf } from "../../../extension/libs/pdf_parser";
-import { getAllCountriesFrom, getAuthorCountries, getDepositLKCExcerpts } from "../../../extension/libs/utils/academia_utils";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
 import { get_array_string_representation } from "../../../extension/libs/utils/str_utils";
 
@@ -21,7 +20,7 @@ export default function Page() {
     const [body, setBody] = useState('');
     const [year, setYear] = useState(-1);
     const [lkcExcerpts, setLkcExcerpts] = useState([''])
-    const [authorCountries, setAuthorCountries] = useState([''])
+    const [authorCountries, setAuthorCountries] = useState('')
 
     // zrc_is_found radius 17
     // deposit_is_found radius 17
@@ -67,9 +66,9 @@ export default function Page() {
             <b>Keywords: </b>{keyword}<br />
             <b>Pages: </b>{pages}<br />
             <b>Year: </b>{year}<br />
+            <b>Author Countries: </b>{authorCountries}<br />
             <b>Body: </b>{body} <br />
             {/* <b>source tab id: </b>{sourceTabId} <br />
-            <b>Author Countries: </b>{authorCountries.join(', ')}<br />
             <b>Are specimens deposited in LKCNHM/RMBR: </b>{`${lkcExcerpts.length > 0}: ${lkcExcerpts[0]}`}<br />
             */}
         </div>
@@ -80,11 +79,14 @@ export default function Page() {
         const pdf = await getPdfProxy(filePath);
         const parsedPdf = await ParsedPdf.getParagraphsByPage(pdf);
 
+        console.log('text:');
+        console.log(parsedPdf.paragraphs);
         setAbstract(parsedPdf.getAbstract() ?? 'undefined')
         setKeyword(parsedPdf.getKeyWords() ?? 'undefined')
         setPages(parsedPdf.paragraphs.length)
         setBody(parsedPdf.getBody() ?? 'undefined')
         setYear(parsedPdf.getYear() ?? -1);
+        setAuthorCountries(parsedPdf.getAuthorCountries())
         // const pages 
         // setLkcExcerpts(getDepositLKCExcerpts(body));
         // setAuthorCountries(getAuthorCountries(body));

@@ -3,6 +3,7 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 // @ts-ignore
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { PDFDocumentProxy, PDFPageProxy, TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
+import { getAllCountriesFrom } from "./utils/academia_utils";
 import { findPhraseinTwoPasses } from "./utils/str_utils";
 
 if (typeof process !== 'object' || process.env.JEST_WORKER_ID === undefined) { // process is not defined on the browser
@@ -21,6 +22,10 @@ const KEYWORD_MIN_WORDS = 5;
 const ACKNOWLEDGEMENTS_SECTION_HEADER_REGEX = /^ACKNOWLEDGEMENTS?/i;
 const BIBLIOGRAPHY_SECTION_HEADER_REGEX = /^(?:LITERATURE CITED|CITATIONS?|REFERENCES?|BIBLIOGRAPHY)/i;
 
+const ACCEPTED_BY_HEADER_REGEX = /^Accepted\s*by\s?:?/i;
+
+const INTRODUCTION_HEADER_REGEX = /^INTRODUCTION/i;
+const METHODOLOGY_HEADER_REGEX = /^(?:MATERIALS?\s+AND\s+METHODS?|METHODOLOGY)/i;
 /**
  * Get the PDFDocumentProxy for a given local pdf url
  * @param url that points to pdf
@@ -71,7 +76,7 @@ export class ParsedPdf {
         const YEAR_REGEX = /\d{4}/;
         const text = this.getBody();
         const candidates = findPhraseinTwoPasses(DATE_REGEX, PUBLICATION_DATE_SIGNPOST_REGEX, text, 8);
-        console.log(candidates);
+
         for (let i = 0; i < candidates.length; i++) {
             const candidate = candidates[i]
             if (YEAR_REGEX.test(candidate))
@@ -102,10 +107,36 @@ export class ParsedPdf {
         return this.getTextbyPages(page_number_array)
     }
 
+    getAuthorCountries(): string {
+        const firstPage = this.paragraphs[0];
+        const accepted_by_header = this.getSection([0], ACCEPTED_BY_HEADER_REGEX, 1);
+        const keywords_header = this.getSection([0], KEYWORD_HEADER_REGEX, 1);
+        const abstract_header = this.getSection([0], ABSTRACT_HEADER_REGEX, 1);
+        const introduction_header = this.getSection([0], INTRODUCTION_HEADER_REGEX, 1);
+        const methodology_header = this.getSection([0], METHODOLOGY_HEADER_REGEX, 1);
 
-
-
-    // getAuthorCountries
+        if (typeof accepted_by_header === 'undefined')
+            throw new Error("Cannot find Author Country");
+        
+        console.log({accepted_by_header})
+        let start_index = firstPage.indexOf(accepted_by_header);
+        let countries = []
+        for (; start_index < firstPage.length; start_index++) {
+            const paragraph = firstPage[start_index];
+            if (
+                paragraph === keywords_header ||
+                paragraph === abstract_header ||
+                paragraph === introduction_header ||
+                paragraph === methodology_header
+            )
+                break;
+                console.log(paragraph);
+                console.log(getAllCountriesFrom(paragraph));
+            countries.push(...getAllCountriesFrom(paragraph))
+        }
+        console.log(countries)
+        return countries.join(', ');
+    }
 
     /**
      * Get a section by the section header regex, as well as the minimum number of words in the section.

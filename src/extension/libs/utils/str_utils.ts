@@ -68,7 +68,7 @@ export function findWordWithRadius(word: string | RegExp, text: string, radius: 
  */
 export function findPhraseinTwoPasses(first_word: string | RegExp, second_phrase: string | RegExp, text: string, radius: number): string[] {
     const first_pass = findWordWithRadius(first_word, text, radius)
-    console.log({first_pass})
+    
     if (typeof second_phrase === 'string') {
         return first_pass.filter(excerpt => excerpt.includes(second_phrase));
     } else {

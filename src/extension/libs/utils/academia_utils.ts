@@ -115,7 +115,7 @@ const COUNTRY_NAMES_LOWERCASE = COUNTRY_NAMES.map(x => x.toLowerCase())
  */
 export function getAllCountriesFrom(text: string): string[] {
     const countries_scraped: string[] = [];
-    text.split(/\s+/).forEach(word => {
+    text.split(/\W*\s+\W*/).forEach(word => {
         if (COUNTRY_NAMES_LOWERCASE.includes(word.toLowerCase())) {
             const index = COUNTRY_NAMES_LOWERCASE.indexOf(word.toLowerCase());
             countries_scraped.push(COUNTRY_NAMES[index]);
