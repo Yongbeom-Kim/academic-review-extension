@@ -12,7 +12,7 @@ const EPSILON = 0.01;
 const PARAGRAPH_Y_VAL_THRESHOLD = 12.5;
 
 const ABSTRACT_HEADER_REGEX = /^Abstract/i;
-const MIN_WORDS_IN_ABSTRACT = 5;
+const ABSTRACT_MIN_WORDS = 5;
 
 export class ParsedPdf {
 
@@ -39,11 +39,20 @@ export class ParsedPdf {
     }
 
     getAbstract(): string | undefined {
+        return this.getSection(ABSTRACT_HEADER_REGEX, ABSTRACT_MIN_WORDS)
+    }
+
+    /**
+     * Get a section by the section header regex, as well as the minimum number of words in the section.
+     * @param section_header_regex regex for section header
+     * @param min_words_in_section minimum amount of words in section
+     * @returns a string (or undefined if not found)
+     */
+    getSection(section_header_regex: RegExp, min_words_in_section: number): string | undefined {
         for (let i = 0; i < this.paragraphs[0].length; i ++) {
             const paragraph = this.paragraphs[0][i];
-            console.log({paragraph, test: ABSTRACT_HEADER_REGEX.test(paragraph)})
-            if (ABSTRACT_HEADER_REGEX.test(paragraph)) {
-                if (paragraph.split(/\s+/).length < 5) {
+            if (section_header_regex.test(paragraph)) {
+                if (paragraph.split(/\s+/).length < min_words_in_section) {
                     return paragraph + ' ' + this.paragraphs[i+1]
                 } else {
                     return paragraph
@@ -118,16 +127,6 @@ export async function getPdfProxy(url: string): Promise<PDFDocumentProxy> {
 
 const KEYWORD_HEADER_REGEX = /Key\s*words\./i
 const KEYWORD_END_REGEX = /RAFFLES|INTRODUCTION/i
-export async function getAbstract(pdf: PDFDocumentProxy): Promise<string> {
-    // abstract is in the 1st page
-    const first_page = await pdf.getPage(1);
-    const text = await getTextInPage(first_page);
-
-    const abstract_start = text.search(ABSTRACT_HEADER_REGEX)
-    const abstract_end = text.search(KEYWORD_HEADER_REGEX)
-
-    return text.slice(abstract_start, abstract_end);
-}
 
 export async function getKeywords(pdf: PDFDocumentProxy): Promise<string> {
     // keyword is in the 1st page
