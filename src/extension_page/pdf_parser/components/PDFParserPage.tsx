@@ -105,7 +105,7 @@ export default function PDFParserPage() {
             countries_focused,
         }
         send_message_to_tab(sourceTabId, return_message);
-        // send_close_current_tab_message();
+        send_close_current_tab_message();
 
 
     }
