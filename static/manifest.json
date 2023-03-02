@@ -1,7 +1,7 @@
 {
-    "name": "Academic Review Plugin",
-    "description": "A Cross Borwser Template for Firefox",
-    "version": "1.0.0",
+    "name": "Raffles Bulletin of Zoology Metadata Review Extension",
+    "description": "A Cross-Browser Extension for Metadata Review (RBZ only)",
+    "version": "0.1.0",
     "manifest_version": 2,
     "permissions": [
         "tabs",

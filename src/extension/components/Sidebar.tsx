@@ -11,7 +11,6 @@ import styles from './Sidebar.module.css';
 import { DATA_ORDERING, METADATA } from '../libs/utils/academia_utils';
 import { send_download_pdfs_message, send_parse_pdf_message } from '../libs/message_handler';
 import { exportCSV } from '../libs/utils/dom_utils';
-import { getPdfProxy } from '../libs/pdf_parser';
 
 
 export default function Sidebar() {
