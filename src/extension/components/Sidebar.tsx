@@ -58,9 +58,17 @@ export default function Sidebar() {
         
         console.log(submitData);
 
+        let dataArray = submitData.toPlainObjectArray();
+        for (let i = 0; i < dataArray.length; i ++) {
+            const parsedPdfData = await send_parse_pdf_message(dataArray[i][METADATA.LocalPath])
+            dataArray[i] = await {...dataArray[i], ...parsedPdfData}
+        }
+
+        submitData = DataFrame.FromPlainObjectArray(dataArray);
+        exportCSV(submitData.toCsvString());
         // opens up a new extension tab to parse the pdf
         // we are forced to open an extension page due to CORS policies on website.
-        send_parse_pdf_message(submitData.getCol(METADATA.LocalPath)[0]).then(x => console.log({x}));
+        // send_parse_pdf_message(submitData.getCol(METADATA.LocalPath)[0]).then(x => console.log({x}));
         // getPdfProxy(submitData.getCol(METADATA.LocalPath)[0]).then(console.log)
 
     }
