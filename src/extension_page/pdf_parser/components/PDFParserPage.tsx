@@ -79,8 +79,8 @@ export default function PDFParserPage() {
         const keywords = parsedPdf.getKeyWords() ?? 'undefined';
         setKeyword(keywords)
 
-        const pages = parsedPdf.paragraphs.length;
-        setPages(pages)
+        // const pages = parsedPdf.paragraphs.length;
+        // setPages(pages)
 
         const body = parsedPdf.getBody() ?? 'undefined';
         setBody(body)
@@ -98,7 +98,6 @@ export default function PDFParserPage() {
         const return_message: ParsePDFResponse = {
             msg: PARSED_PDF_RESPONSE_MSG,
             filePath: pdfFilePath,
-            pages,
             year,
             countries,
         }
