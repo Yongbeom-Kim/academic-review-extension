@@ -1,0 +1,27 @@
+{
+    "name": "Raffles Bulletin of Zoology Metadata Review Extension",
+    "description": "A Cross-Browser Extension for Metadata Review (RBZ only)",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "scripting",
+        "downloads"
+    ],
+    "action": {},
+    "background": {
+        "service_worker": "background_script/detect_browser_actions.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content_script/inject_html.js"
+            ]
+        }
+    ]
+}
