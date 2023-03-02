@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { send_close_current_tab_message, send_message_to_tab } from "../../../extension/libs/message_handler";
 import { getPdfProxy, ParsedPdf } from "../../../extension/libs/pdf_parser";
+import { getAllCountriesFrom } from "../../../extension/libs/utils/academia_utils";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
 import { get_array_string_representation } from "../../../extension/libs/utils/str_utils";
 
@@ -88,9 +89,10 @@ export default function PDFParserPage() {
         const year = parsedPdf.getYear() ?? -1;
         setYear(year);
 
-        const countries = parsedPdf.getAuthorCountries();
-        setAuthorCountries(countries)
+        const author_countries = parsedPdf.getAuthorCountries();
+        setAuthorCountries(author_countries)
 
+        const countries_focused = getAllCountriesFrom(parsedPdf.getAbstract() ?? "").join(', ');
         // const pages 
         // setLkcExcerpts(getDepositLKCExcerpts(body));
         // setAuthorCountries(getAuthorCountries(body));
@@ -99,7 +101,8 @@ export default function PDFParserPage() {
             msg: PARSED_PDF_RESPONSE_MSG,
             filePath: pdfFilePath,
             year,
-            countries,
+            author_countries,
+            countries_focused,
         }
         send_message_to_tab(sourceTabId, return_message);
         // send_close_current_tab_message();

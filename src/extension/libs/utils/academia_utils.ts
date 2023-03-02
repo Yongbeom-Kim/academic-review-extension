@@ -62,7 +62,8 @@ export const METADATA = {
     PageNumber: 'page_no',
     PublicationType: 'publication_type',
     Keywords: 'keywords',
-    Countries: 'countries',
+    AuthorCountries: 'author_countries',
+    CountriesOfInterest: 'countries_focused',
     Link: 'link',
     Display: 'display_string',
     CiteKey: 'cite_key',
@@ -79,7 +80,8 @@ export const DATA_ORDERING = [
     METADATA.PageNumber,
     METADATA.PublicationType,
     METADATA.Keywords,
-    METADATA.Countries,
+    METADATA.AuthorCountries,
+    METADATA.CountriesOfInterest,
     METADATA.Link,
     METADATA.Display
 ];
