@@ -1,10 +1,10 @@
 import * as ReactDOM from 'react-dom/client';
 import React from 'react';
-import Page from './components/Page';
+import PDFParserPage from './components/PDFParserPage';
 
 ReactDOM.createRoot(document.getElementById('root') as Element).render(
 
     <>
-        <Page></Page>
+        <PDFParserPage></PDFParserPage>
     </>
 )

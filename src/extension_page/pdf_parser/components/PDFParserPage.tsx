@@ -1,13 +1,13 @@
 import { TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
-import { send_message_to_tab } from "../../../extension/libs/message_handler";
+import { send_close_current_tab_message, send_message_to_tab } from "../../../extension/libs/message_handler";
 import { getPdfProxy, ParsedPdf } from "../../../extension/libs/pdf_parser";
 import { PARSED_PDF_RESPONSE_MSG, ParsePDFRequest, ParsePDFResponse, PARSE_PDF_REQUEST_MSG } from "../../../extension/libs/utils/messaging_types";
 import { get_array_string_representation } from "../../../extension/libs/utils/str_utils";
 
 
-export default function Page() {
+export default function PDFParserPage() {
 
     const [pdfFilePath, setPdfFilePath] = useState('');
     const [sourceTabId, setSourceTabId] = useState(-1);
@@ -49,7 +49,12 @@ export default function Page() {
             filePath: pdfFilePath,
             data: "hello"
         }
-        send_message_to_tab(sourceTabId, return_message);
+
+        if (sourceTabId !== -1) {
+            send_message_to_tab(sourceTabId, return_message);
+            send_close_current_tab_message();
+        }
+
     }, [sourceTabId])
 
     useEffect(() => {

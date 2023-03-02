@@ -105,11 +105,12 @@ export async function receive_download_pdf_message(received_request: BatchDownlo
 
         Browser.tabs.query({ active: true, currentWindow: true }).then(async (tabs) => {
             const id_to_send = tabs[0].id
-            if (typeof id_to_send === 'undefined')
-                throw new Error(`invalid tab id, ${id_to_send}`)
+            if (typeof id_to_send === 'undefined') {
+                console.error(`invalid tab id, ${id_to_send}`)
+                return;
+            }
 
-            console.log("Sending message");
-            console.log(response);
+            // console.debug(`Sending Batch Download PDF Response: id: ${id_to_send}, response: ${JSON.stringify(response)}`)
             Browser.tabs.sendMessage(id_to_send, response);
         })
 
@@ -127,7 +128,7 @@ export function send_parse_pdf_message(pdf_url: string): Promise<ParsedPDFRespon
     const request: ParsePDFRequest = { msg: PARSE_PDF_REQUEST_MSG, filePath: pdf_url }
     Browser.runtime.sendMessage(request)
 
-    
+
     // promise returned
     let parsed_pdf_response_data: ParsedPDFResponse | undefined = undefined;
     const response_promise: Promise<ParsedPDFResponse> = new Promise(resolve => {
@@ -157,7 +158,7 @@ export async function receive_open_pdf_message(request: ParsePDFRequest, sender:
     // from src/extension/components/Sidebar.tsx
     if (request.msg !== PARSE_PDF_MESSAGE_NAME)
         return;
-    
+
     const tab = await Browser.tabs.create({
         url: `extension_page/pdf_parser/index.html`
     })
@@ -185,10 +186,45 @@ export async function receive_open_pdf_message(request: ParsePDFRequest, sender:
  * @param message message to send
  */
 export function send_message_to_tab(tabId: number, message_data: Object) {
-    Browser.runtime.sendMessage({msg: 'send_msg_to_tab', tabId, message_data});
+    console.debug(`Sending message: ${JSON.stringify({ msg: 'send_msg_to_tab', tabId, message_data })}`)
+    Browser.runtime.sendMessage({ msg: 'send_msg_to_tab', tabId, message_data });
 }
 
-export function handle_send_message_to_tab({msg, tabId, message_data}: {msg: string, tabId: number, message_data: any}) {
-    if (msg === 'send_msg_to_tab')
-        Browser.tabs.sendMessage(tabId, message_data)
+export function handle_send_message_to_tab({ msg, tabId, message_data }: { msg: string, tabId: number, message_data: any }) {
+    if (msg !== 'send_msg_to_tab')
+        return;
+
+    if (typeof tabId === 'undefined' || tabId === -1)
+        console.error(`Received invalid tab id when handling msg ${msg}: ${tabId}`)
+    else
+        console.debug(`Received msg ${msg}: ${tabId}`)
+
+    Browser.tabs.sendMessage(tabId, message_data)
+}
+
+export function send_close_current_tab_message() {
+    console.debug(`Sending message: ${JSON.stringify({ msg: 'close_tab' })}`)
+    Browser.runtime.sendMessage({ msg: 'close_tab' })
+}
+
+export function receive_close_current_tab_message({msg}: { msg: string }, sender: Browser.Runtime.MessageSender) {
+    if (msg !== 'close_tab')
+        return;
+
+    const sender_tab = sender.tab;
+    if (typeof sender_tab === 'undefined') {
+        console.error(`Invalid sender tab when receiving ${msg} message: ${sender_tab}`);
+        return;
+    }
+
+    const sender_id = sender_tab.id;
+    if (typeof sender_id === 'undefined' || sender_id === -1) {
+        console.error(`Invalid sender tab id when receiving ${msg} message: ${sender_id}`);
+        return;
+    }
+    
+    console.debug(`Received msg ${msg} message: ${sender_id}`);
+
+    Browser.tabs.remove(sender_id);
+
 }

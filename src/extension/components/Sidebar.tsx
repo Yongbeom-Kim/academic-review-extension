@@ -60,7 +60,7 @@ export default function Sidebar() {
 
         // opens up a new extension tab to parse the pdf
         // we are forced to open an extension page due to CORS policies on website.
-        send_parse_pdf_message(submitData.getCol(METADATA.LocalPath)[0]).then(x => console.log(x));
+        send_parse_pdf_message(submitData.getCol(METADATA.LocalPath)[0]).then(x => console.log({x}));
         // getPdfProxy(submitData.getCol(METADATA.LocalPath)[0]).then(console.log)
 
     }
