@@ -23,9 +23,8 @@ export const PARSE_PDF_REQUEST_MSG = 'parse_pdf' //msg field of above type
 export type ParsePDFResponse = {
     msg: string, 
     filePath: string, 
-    data: string, 
     pages: number,
     year: number,
-    authorCountries: string,
+    countries: string,
 } // placeholder data
 export const PARSED_PDF_RESPONSE_MSG = 'parsed_pdf_data' //msg field of above type

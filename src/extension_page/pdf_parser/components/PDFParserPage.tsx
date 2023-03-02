@@ -88,8 +88,8 @@ export default function PDFParserPage() {
         const year = parsedPdf.getYear() ?? -1;
         setYear(year);
 
-        const authorCountries = parsedPdf.getAuthorCountries();
-        setAuthorCountries(authorCountries)
+        const countries = parsedPdf.getAuthorCountries();
+        setAuthorCountries(countries)
 
         // const pages 
         // setLkcExcerpts(getDepositLKCExcerpts(body));
@@ -98,10 +98,9 @@ export default function PDFParserPage() {
         const return_message: ParsePDFResponse = {
             msg: PARSED_PDF_RESPONSE_MSG,
             filePath: pdfFilePath,
-            data: "hello",
             pages,
             year,
-            authorCountries,
+            countries,
         }
         send_message_to_tab(sourceTabId, return_message);
         send_close_current_tab_message();
