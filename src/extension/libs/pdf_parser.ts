@@ -133,6 +133,7 @@ export class ParsedPdf {
                 console.log(paragraph);
                 console.log(getAllCountriesFrom(paragraph));
             countries.push(...getAllCountriesFrom(paragraph))
+            // countries.push(getAllCountriesFrom(paragraph)[0])
         }
         console.log(countries)
         return countries.join(', ');
