@@ -16,6 +16,6 @@ browser.runtime.onMessage.addListener(receive_open_pdf_message)
 browser.runtime.onMessage.addListener(receive_download_pdf_message)
 browser.runtime.onMessage.addListener(handle_send_message_to_tab)
 browser.runtime.onMessage.addListener(receive_close_current_tab_message)
-browser.runtime.onMessage.addListener((message, sender) => {
-    console.debug(`Received message ${JSON.stringify(message)}, sender: ${JSON.stringify(sender)}`)
-})
+// browser.runtime.onMessage.addListener((message, sender) => {
+//     console.debug(`Received message ${JSON.stringify(message)}, sender: ${JSON.stringify(sender)}`)
+// })

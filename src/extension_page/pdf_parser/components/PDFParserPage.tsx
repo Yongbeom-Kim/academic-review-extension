@@ -44,20 +44,6 @@ export default function PDFParserPage() {
     }, [])
 
     useEffect(() => {
-        const return_message: ParsePDFResponse = {
-            msg: PARSED_PDF_RESPONSE_MSG,
-            filePath: pdfFilePath,
-            data: "hello"
-        }
-
-        if (sourceTabId !== -1) {
-            send_message_to_tab(sourceTabId, return_message);
-            send_close_current_tab_message();
-        }
-
-    }, [sourceTabId])
-
-    useEffect(() => {
         if (typeof pdfFilePath === undefined || pdfFilePath === '')
             return;
         getPdfInfo(pdfFilePath);
@@ -86,14 +72,41 @@ export default function PDFParserPage() {
 
         console.log('text:');
         console.log(parsedPdf.paragraphs);
-        setAbstract(parsedPdf.getAbstract() ?? 'undefined')
-        setKeyword(parsedPdf.getKeyWords() ?? 'undefined')
-        setPages(parsedPdf.paragraphs.length)
-        setBody(parsedPdf.getBody() ?? 'undefined')
-        setYear(parsedPdf.getYear() ?? -1);
-        setAuthorCountries(parsedPdf.getAuthorCountries())
+
+        const abstract = parsedPdf.getAbstract() ?? 'undefined';
+        setAbstract(abstract)
+
+        const keywords = parsedPdf.getKeyWords() ?? 'undefined';
+        setKeyword(keywords)
+
+        const pages = parsedPdf.paragraphs.length;
+        setPages(pages)
+
+        const body = parsedPdf.getBody() ?? 'undefined';
+        setBody(body)
+
+        const year = parsedPdf.getYear() ?? -1;
+        setYear(year);
+
+        const authorCountries = parsedPdf.getAuthorCountries();
+        setAuthorCountries(authorCountries)
+
         // const pages 
         // setLkcExcerpts(getDepositLKCExcerpts(body));
         // setAuthorCountries(getAuthorCountries(body));
+
+        const return_message: ParsePDFResponse = {
+            msg: PARSED_PDF_RESPONSE_MSG,
+            filePath: pdfFilePath,
+            data: "hello",
+            pages,
+            year,
+            authorCountries,
+        }
+        send_message_to_tab(sourceTabId, return_message);
+        send_close_current_tab_message();
+
+
     }
+
 }
