@@ -118,7 +118,7 @@ export class ParsedPdf {
         if (typeof accepted_by_header === 'undefined')
             throw new Error("Cannot find Author Country");
         
-        console.log({accepted_by_header})
+        // console.log({accepted_by_header})
         let start_index = firstPage.indexOf(accepted_by_header);
         let countries = []
         for (; start_index < firstPage.length; start_index++) {
@@ -130,12 +130,9 @@ export class ParsedPdf {
                 paragraph === methodology_header
             )
                 break;
-                console.log(paragraph);
-                console.log(getAllCountriesFrom(paragraph));
             countries.push(...getAllCountriesFrom(paragraph))
             // countries.push(getAllCountriesFrom(paragraph)[0])
         }
-        console.log(countries)
         return countries.join(', ');
     }
 

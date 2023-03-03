@@ -20,8 +20,6 @@ export function findWordWithRadius(word: string | RegExp, text: string, radius: 
     const words = text.split(/\s+/).map(x => x.trim());
     let words_copy = cloneDeep(words);
 
-    console.log({words_copy})
-    console.log({word})
     const indices = [];
 
     let sliced = 0

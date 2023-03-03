@@ -22,6 +22,7 @@ export default function PDFParserPage() {
     const [year, setYear] = useState(-1);
     const [lkcExcerpts, setLkcExcerpts] = useState([''])
     const [authorCountries, setAuthorCountries] = useState('')
+    const [abstractCountries, setAbstractCountries] = useState('')
 
     // zrc_is_found radius 17
     // deposit_is_found radius 17
@@ -59,6 +60,7 @@ export default function PDFParserPage() {
             <b>Pages: </b>{pages}<br />
             <b>Year: </b>{year}<br />
             <b>Author Countries: </b>{authorCountries}<br />
+            <b>Abstract Countries: </b>{abstractCountries}<br />
             <b>Body: </b>{body} <br />
             {/* <b>source tab id: </b>{sourceTabId} <br />
             <b>Are specimens deposited in LKCNHM/RMBR: </b>{`${lkcExcerpts.length > 0}: ${lkcExcerpts[0]}`}<br />
@@ -80,8 +82,8 @@ export default function PDFParserPage() {
         const keywords = parsedPdf.getKeyWords() ?? 'undefined';
         setKeyword(keywords)
 
-        // const pages = parsedPdf.paragraphs.length;
-        // setPages(pages)
+        const pages = parsedPdf.paragraphs.length;
+        setPages(pages)
 
         const body = parsedPdf.getBody() ?? 'undefined';
         setBody(body)
@@ -92,7 +94,8 @@ export default function PDFParserPage() {
         const author_countries = parsedPdf.getAuthorCountries();
         setAuthorCountries(author_countries)
 
-        const countries_focused = getAllCountriesFrom(parsedPdf.getAbstract() ?? "").join(', ');
+        const abstract_countries = getAllCountriesFrom(parsedPdf.getAbstract() ?? "").join(', ');
+        setAbstractCountries(abstract_countries);
         // const pages 
         // setLkcExcerpts(getDepositLKCExcerpts(body));
         // setAuthorCountries(getAuthorCountries(body));
@@ -102,7 +105,7 @@ export default function PDFParserPage() {
             filePath: pdfFilePath,
             year,
             author_countries,
-            countries_focused,
+            countries_focused: abstract_countries,
         }
         send_message_to_tab(sourceTabId, return_message);
         send_close_current_tab_message();

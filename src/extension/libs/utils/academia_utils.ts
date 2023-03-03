@@ -117,12 +117,38 @@ const COUNTRY_NAMES_LOWERCASE = COUNTRY_NAMES.map(x => x.toLowerCase())
  */
 export function getAllCountriesFrom(text: string): string[] {
     const countries_scraped: string[] = [];
+    text = text.toLowerCase();
     text.split(/\W*\s+\W*/).forEach(word => {
-        if (COUNTRY_NAMES_LOWERCASE.includes(word.toLowerCase())) {
+        if (COUNTRY_NAMES_LOWERCASE.includes(word)) {
             const index = COUNTRY_NAMES_LOWERCASE.indexOf(word.toLowerCase());
             countries_scraped.push(COUNTRY_NAMES[index]);
         }
     })
 
     return countries_scraped;
+}
+
+/**
+ * Method to extract all UNIQUE countries (in order) from a text.
+ * @param text text to extract country from
+ * @returns the countries extracted.
+ * @param text 
+ */
+export function getAllUniqueCountriesFrom(text: string): string[] {
+    let countries = getAllCountriesFrom(text);
+
+    const country_count: Record<string, number> = {};
+    for (let i = 0; i < countries.length; i ++) {
+        const country = countries[i];
+        country_count[country] = (country_count[country] ?? 0) + 1
+    }
+
+    for (let i = countries.length; i >= 0; i --) {
+        const country = countries[i];
+        if (country_count[country] > 1) {
+            country_count[country] --
+            countries = countries.splice(i, 1)
+        }
+    }
+    return countries;
 }
