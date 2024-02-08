@@ -1,6 +1,8 @@
 # About
 
-This is a cross-browser extension to facilitate metadata research, particularly for the Raffles Bulletin of Zoology. This extension works by collecting automatically metadata from journal entries on the website and their PDFs. Note that this extension only uses ManifestV2, so it has to be installed manually on browsers. After collecting said metadata, the extension will emit a `.csv` file.
+This is a cross-browser extension to facilitate metadata research for the Raffles Bulletin of Zoology. This extension works by collecting automatically metadata from journal entries on the website and their PDFs.
+
+Note that this extension only uses ManifestV2, so it has to be installed manually on browsers. After collecting said metadata, the extension will emit a `.csv` file.
 
 This extension is built using React, PDFjs and bundled using esbuild.
 
